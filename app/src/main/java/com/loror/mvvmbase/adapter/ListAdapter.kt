@@ -16,7 +16,7 @@ class ListAdapter(context: Context) : HolderBaseAdapter(context) {
         binding.executePendingBindings()
     }
 
-    override fun count(): Int {
+    override fun getCount(): Int {
         return 3
     }
 

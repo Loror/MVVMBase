@@ -21,18 +21,6 @@ abstract class HolderBaseAdapter(val context: Context) : BaseAdapter() {
     @LayoutRes
     abstract fun getLayout(position: Int): Int
     abstract fun bindView(binding: ViewDataBinding, position: Int)
-    abstract fun count(): Int
-    fun showEmptyView(): Boolean {
-        return false
-    }
-
-    fun emptyView(inflater: LayoutInflater?, parent: ViewGroup?): View? {
-        return null
-    }
-
-    override fun getCount(): Int {
-        return if (showEmptyView()) if (count() == 0) 1 else count() else count()
-    }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view: View
