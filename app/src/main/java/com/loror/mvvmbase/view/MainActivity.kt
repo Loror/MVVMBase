@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.loror.mvvmbase.R
+import com.loror.mvvmbase.adapter.ListAdapter
 import com.loror.mvvmbase.databinding.ActivityMainBinding
 import com.loror.mvvmbase.util.BaseActivity
 import com.loror.mvvmbase.viewModel.MainViewModel
@@ -21,6 +22,8 @@ class MainActivity : BaseActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         //绑定viewModel
         binding.viewModel = viewModel
+        //绑定adapter
+        binding.adapter = ListAdapter(this)
         //lifecycle配置监听
         lifecycle.addObserver(viewModel)
         //liveData监听
