@@ -1,4 +1,4 @@
-package com.loror.rembercard.net
+package com.loror.mvvm.net
 
 import com.loror.lororUtil.http.ProgressListener
 

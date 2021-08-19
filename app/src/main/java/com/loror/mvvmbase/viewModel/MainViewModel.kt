@@ -1,22 +1,30 @@
 package com.loror.mvvmbase.viewModel
 
 import androidx.databinding.ObservableField
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import com.loror.lororUtil.http.Responce
-import com.loror.lororUtil.http.api.Observer
-import com.loror.mvvmbase.model.Text2
-import com.loror.mvvmbase.util.MutableLiveData
-import com.loror.rembercard.net.Action
+import com.loror.mvvm.core.BaseViewModel
+import com.loror.mvvm.net.Action
+import com.loror.mvvm.net.Message
+import com.loror.mvvmbase.bean.Text2
+import com.loror.mvvmbase.model.MainModel
 import com.loror.rembercard.net.ApiServiceUtil
-import com.loror.rembercard.net.Message
 
-class MainViewModel : ViewModel(), LifecycleObserver {
+class MainViewModel : BaseViewModel(), LifecycleObserver {
+
+    companion object {
+        const val EVENT_SHOW_BACK = 1
+    }
+
+    private val model = MainModel(this)
 
     //Model
     val text1: ObservableField<String> = ObservableField()
     val text2: Text2 = Text2()
 
-    val liveData: MutableLiveData<String> = MutableLiveData()
+    private var times = 1
 
     //lifecycle注册
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -26,15 +34,18 @@ class MainViewModel : ViewModel(), LifecycleObserver {
     }
 
     fun netBaidu() {
-        ApiServiceUtil.serviceApi.baidu()
-            .subscribe(object : Action<Responce>() {
-                override fun success(data: Responce?) {
-                    liveData.setValue("访问百度成功")
-                }
+        model.netBaidu()
+    }
 
-                override fun failed(message: Message) {
-                    liveData.setValue("访问百度失败:" + message.message)
-                }
-            })
+    fun showBack() {
+        dispatchLiveDataEvent(EVENT_SHOW_BACK, "回显次数：${times++}")
+    }
+
+    fun baiduFailed(message: String) {
+        failed(message)
+    }
+
+    fun baiduSuccess(message: String) {
+        success(message)
     }
 }

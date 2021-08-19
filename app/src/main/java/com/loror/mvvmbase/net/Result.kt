@@ -10,6 +10,7 @@ class Result {
     var data: String? = null
     var msg: String? = null
     private var suitePhpEmptyObject = false
+
     fun setSuitePhpEmptyObject(suitePhpEmptyObject: Boolean) {
         this.suitePhpEmptyObject = suitePhpEmptyObject
     }

@@ -6,18 +6,24 @@ plugins {
 }
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "30.0.1"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.loror.mvvmbase"
-        minSdkVersion 17
-        targetSdkVersion 29
+        minSdkVersion 21
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+//    signingConfigs {
+//        debug {
+//            v2SigningEnabled false
+//        }
+//    }
 
     buildTypes {
         release {
@@ -48,12 +54,12 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'com.google.android.material:material:1.2.1'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.0'
     implementation 'org.koin:koin-androidx-scope:2.0.1'
     implementation 'org.koin:koin-androidx-viewmodel:2.0.1'
     implementation 'com.alibaba:fastjson:1.2.62'
-    implementation 'com.github.Loror:LororUtil:1.8.0'
+    implementation project(path: ':mvvm')
 }

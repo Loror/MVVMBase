@@ -5,6 +5,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import com.loror.mvvm.annotation.LiveDataEvent
+import com.loror.mvvm.core.BaseViewModel
 import com.loror.mvvmbase.R
 import com.loror.mvvmbase.adapter.ListAdapter
 import com.loror.mvvmbase.databinding.ActivityMainBinding
@@ -20,18 +22,35 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        //绑定viewModel
-        binding.viewModel = viewModel
-        //绑定adapter
-        binding.adapter = ListAdapter(this)
-        //lifecycle配置监听
-        lifecycle.addObserver(viewModel)
-        //liveData监听
-        viewModel.liveData.observe(this,
-            { t -> Toast.makeText(context, t, Toast.LENGTH_SHORT).show() })
+        binding.viewModel = viewModel//绑定viewModel
+        viewModel.attachView(this)
+        viewModel.listenLifeCycle(this)
+        initView()
     }
 
-    fun onButtonClick(v: View) {
-        viewModel.netBaidu()
+    private fun initView() {
+        binding.adapter = ListAdapter(this)//绑定adapter
+        binding.net.setOnClickListener {
+            viewModel.netBaidu()
+        }
+        binding.showBack.setOnClickListener {
+            viewModel.showBack()
+        }
     }
+
+    @LiveDataEvent(MainViewModel.EVENT_SHOW_BACK)
+    fun show(message: String) {
+        binding.showBack.text = message
+    }
+
+    @LiveDataEvent(BaseViewModel.EVENT_SUCCESS)
+    fun success(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
+    @LiveDataEvent(BaseViewModel.EVENT_FAILED)
+    fun failed(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.loror.rembercard.net
+package com.loror.mvvm.net
 
 class Message {
     var code = 0

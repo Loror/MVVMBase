@@ -3,6 +3,7 @@ package com.loror.rembercard.net
 import android.util.Log
 import com.loror.lororUtil.http.HttpClient
 import com.loror.lororUtil.http.api.*
+import com.loror.mvvm.net.LogRequestListener
 import com.loror.mvvmbase.net.ServiceApi
 
 /**
@@ -19,6 +20,7 @@ object ApiServiceUtil {
             .setOnRequestListener(
                 MultiOnRequestListener()
                     .addOnRequestListener(CookieRequestListener())
+                    .addOnRequestListener(LogRequestListener())
                     .addOnRequestListener(object : OnRequestListener {
                         override fun onRequestBegin(client: HttpClient, request: ApiRequest) {
                             client.timeOut = 15000
@@ -31,7 +33,7 @@ object ApiServiceUtil {
                             }
                             val responce = result.responce
                             val url = result.url
-                            val params = result.params
+                            val params = result.apiRequest.params
                             Log.e("RESULT_", "url:$url")
                             Log.e("RESULT_", "param:$params")
                             val resultStr = responce.toString()

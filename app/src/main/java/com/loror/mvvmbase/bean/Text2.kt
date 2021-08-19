@@ -1,4 +1,4 @@
-package com.loror.mvvmbase.model
+package com.loror.mvvmbase.bean
 
 import androidx.databinding.BaseObservable
 

@@ -1,4 +1,4 @@
-package com.loror.mvvmbase.util
+package com.loror.mvvm.core
 
 import androidx.lifecycle.LiveData
 

@@ -45,10 +45,16 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
+            android:id="@+id/net"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onButtonClick"
             android:text="网络访问" />
+
+        <Button
+            android:id="@+id/showBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="回显" />
 
         <ListView
             android:layout_width="match_parent"

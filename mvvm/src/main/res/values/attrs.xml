@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="CutImageView">
+        <attr name="borderPadding" format="dimension" />
+        <attr name="cutButtonWidth" format="dimension" />
+        <attr name="cutScale" format="float" />
+        <attr name="cutDragEnable" format="boolean" />
+        <attr name="cutButtonColor" format="color" />
+        <attr name="borderShadowColor" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="DrawImageView">
+        <attr name="drawWidth" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="ColorTextView">
+        <attr name="specialTextColor" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="LineTextView">
+        <attr name="lineLocation" format="enum">
+            <enum name="center" value="0" />
+            <enum name="under" value="1" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="AlignTextView">
+        <attr name="align" format="enum">
+            <enum name="left" value="0" />
+            <enum name="center" value="1" />
+            <enum name="right" value="2" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="ConnerLayout">
+        <attr name="borderColor" format="color" />
+        <attr name="fillColor" format="color" />
+        <attr name="arcRadios" format="dimension" />
+        <attr name="strokWidth" format="dimension" />
+    </declare-styleable>
+
+</resources>
