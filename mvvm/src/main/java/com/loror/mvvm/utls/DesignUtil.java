@@ -5,7 +5,6 @@ import android.app.Application;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
-import com.loror.lororUtil.BuildConfig;
 import com.loror.lororUtil.convert.DpPxUtil;
 
 public class DesignUtil {
