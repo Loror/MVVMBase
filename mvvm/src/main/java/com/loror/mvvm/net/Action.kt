@@ -14,10 +14,10 @@ abstract class Action<T> : Observer<T> {
 
     companion object {
         const val UNKNOWN = 0B10000000000
-        const val DNS_ERROR = 0B11000000000
-        const val CONNECT_ERROR = 0B11100000000
-        const val CONNECT_TIME_OUT = 0B11110000000
-        const val REQUEST_CANCELED = 0B11111000000
+        const val DNS_ERROR = 1
+        const val CONNECT_ERROR = 2
+        const val CONNECT_TIME_OUT = 4
+        const val REQUEST_CANCELED = 8
         const val UNKNOWN_EXCEPTION = -1
     }
 
