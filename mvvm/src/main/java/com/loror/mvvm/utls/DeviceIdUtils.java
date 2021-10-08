@@ -14,7 +14,6 @@ import android.provider.MediaStore;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -28,6 +27,8 @@ import java.util.UUID;
 public class DeviceIdUtils {
 
     private static final String TAG = DeviceIdUtils.class.getSimpleName();
+
+    private static final String SHARE_UUID = "uuid";
 
     private static final String TEMP_DIR = "system_config";
     private static final String TEMP_FILE_NAME = "system_file";
@@ -52,8 +53,24 @@ public class DeviceIdUtils {
     }
 
     private static String createUUID(Context context) {
-        String uuid = UUID.randomUUID().toString().replace("-", "");
+        String uuid = null;
+        try {
+            uuid = getUUID(context);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (TextUtils.isEmpty(uuid)) {
+            uuid = SharedPreferenceUtil.getString(SHARE_UUID);
+            if (TextUtils.isEmpty(uuid)) {
+                uuid = UUID.randomUUID().toString().replace("-", "");
+                SharedPreferenceUtil.save(SHARE_UUID, uuid);
+            }
+        }
+        return uuid;
+    }
 
+    private static String getUUID(Context context) {
+        String uuid = UUID.randomUUID().toString().replace("-", "");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             Uri externalContentUri = MediaStore.Downloads.EXTERNAL_CONTENT_URI;
             ContentResolver contentResolver = context.getContentResolver();
@@ -101,7 +118,6 @@ public class DeviceIdUtils {
                 contentValues.put(MediaStore.Downloads.MIME_TYPE, TEMP_FILE_NAME_MIME_TYPE);
                 contentValues.put(MediaStore.Downloads.DISPLAY_NAME, TEMP_FILE_NAME);
                 contentValues.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + File.separator + TEMP_DIR);
-
                 Uri insert = contentResolver.insert(externalContentUri, contentValues);
                 if (insert != null) {
                     OutputStream outputStream = null;
@@ -185,7 +201,6 @@ public class DeviceIdUtils {
                 }
             }
         }
-
         return uuid;
     }
 

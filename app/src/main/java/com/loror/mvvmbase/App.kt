@@ -5,12 +5,14 @@ import com.alibaba.fastjson.JSON
 import com.loror.lororUtil.http.api.ApiClient
 import com.loror.lororUtil.http.api.JsonParser
 import com.loror.lororUtil.http.api.TypeInfo
+import com.loror.mvvm.utls.SharedPreferenceUtil
 
 
 class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        SharedPreferenceUtil.init(this)
         ApiClient.setJsonParser(object : JsonParser {
 
             override fun jsonToObject(json: String?, typeInfo: TypeInfo?): Any {
