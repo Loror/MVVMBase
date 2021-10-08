@@ -20,11 +20,7 @@ public class FileLogger {
     private static String dir;
     private static String date;
     private static final RemoveableThreadPool threadPool = new ThreadPool(1);
-    private static final DateFormat formatter;
-
-    static {
-        formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss:SSS", Locale.CHINA);
-    }
+    private static final DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss:SSS", Locale.CHINA);
 
     private static String getDate() {
         if (date == null) {
@@ -44,6 +40,9 @@ public class FileLogger {
         FileLogger.dir = dir;
     }
 
+    /**
+     * 写出日志
+     */
     public static boolean d(String message) {
         if (TextUtils.isEmpty(dir)) {
             return false;
@@ -82,6 +81,39 @@ public class FileLogger {
             }
         });
         return true;
+    }
+
+    /**
+     * 清除30天以前日志
+     */
+    public static void clear() {
+        if (TextUtils.isEmpty(dir)) {
+            return;
+        }
+        threadPool.excute(() -> {
+            try {
+                if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                    File dir = new File(FileLogger.dir);
+                    if (dir.exists()) {
+                        File[] files = dir.listFiles();
+                        if (files == null) {
+                            return;
+                        }
+                        for (File file : files) {
+                            if (file.lastModified() < System.currentTimeMillis() - 30 * 24 * 60 * 60 * 1000L) {
+                                if (file.delete()) {
+                                    Log.d("FileLogger", file.getName() + " have been deleted");
+                                } else {
+                                    Log.e("FileLogger", file.getName() + " cannot been deleted");
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e("FileLogger", "an error occurred while delete file...", e);
+            }
+        });
     }
 
 }
