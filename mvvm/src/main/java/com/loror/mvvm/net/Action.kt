@@ -38,7 +38,7 @@ abstract class Action<T> : Observer<T> {
                 message.code = REQUEST_CANCELED
                 message.message = "网络请求取消"
             } else {
-                message.code = UNKNOWN and code
+                message.code = UNKNOWN or code
                 message.message = responce.toString()
             }
         } else {
