@@ -1,4 +1,4 @@
-package com.loror.rembercard.net
+package com.loror.mvvmbase.net
 
 import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.JSONArray

@@ -4,7 +4,7 @@ import com.loror.lororUtil.http.Responce
 import com.loror.mvvm.net.Action
 import com.loror.mvvm.net.Message
 import com.loror.mvvmbase.viewModel.MainViewModel
-import com.loror.rembercard.net.ApiServiceUtil
+import com.loror.mvvmbase.net.ApiServiceUtil
 
 class MainModel(private val viewModel: MainViewModel) {
 

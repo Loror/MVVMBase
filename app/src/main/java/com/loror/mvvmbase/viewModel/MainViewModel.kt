@@ -4,13 +4,9 @@ import androidx.databinding.ObservableField
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import com.loror.lororUtil.http.Responce
 import com.loror.mvvm.core.BaseViewModel
-import com.loror.mvvm.net.Action
-import com.loror.mvvm.net.Message
 import com.loror.mvvmbase.bean.Text2
 import com.loror.mvvmbase.model.MainModel
-import com.loror.rembercard.net.ApiServiceUtil
 
 class MainViewModel : BaseViewModel(), LifecycleObserver {
 

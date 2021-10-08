@@ -1,10 +1,10 @@
-package com.loror.rembercard.net
+package com.loror.mvvmbase.net
 
 import android.util.Log
 import com.loror.lororUtil.http.HttpClient
 import com.loror.lororUtil.http.api.*
+import com.loror.mvvm.net.CookieRequestListener
 import com.loror.mvvm.net.LogRequestListener
-import com.loror.mvvmbase.net.ServiceApi
 
 /**
  * Date: 2019/3/18 15:41
