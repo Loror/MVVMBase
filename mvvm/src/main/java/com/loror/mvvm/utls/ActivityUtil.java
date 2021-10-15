@@ -12,6 +12,7 @@ import com.loror.lororUtil.flyweight.ObjectPool;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ActivityUtil {
@@ -95,8 +96,10 @@ public class ActivityUtil {
     /**
      * 关闭界面到activity，activity不关闭
      */
-    public static void finishUtil(Class<? extends Activity> activity) {
-        for (Activity a : activities) {
+    public static void finishUntil(Class<? extends Activity> activity) {
+        List<Activity> task = new ArrayList<>(activities);
+        Collections.reverse(task);
+        for (Activity a : task) {
             if (a.getClass() == activity) {
                 break;
             }
@@ -107,8 +110,10 @@ public class ActivityUtil {
     /**
      * 关闭界面到activity，包含activity关闭
      */
-    public static void finishUtilInclude(Class<? extends Activity> activity) {
-        for (Activity a : activities) {
+    public static void finishUntilInclude(Class<? extends Activity> activity) {
+        List<Activity> task = new ArrayList<>(activities);
+        Collections.reverse(task);
+        for (Activity a : task) {
             a.finish();
             if (a.getClass() == activity) {
                 break;
