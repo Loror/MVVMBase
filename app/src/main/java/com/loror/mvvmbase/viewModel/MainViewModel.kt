@@ -7,6 +7,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.loror.mvvm.core.BaseViewModel
 import com.loror.mvvmbase.bean.Text2
 import com.loror.mvvmbase.model.MainModel
+import com.loror.mvvmbase.widget.Image
 
 class MainViewModel : BaseViewModel(), LifecycleObserver {
 
@@ -19,6 +20,9 @@ class MainViewModel : BaseViewModel(), LifecycleObserver {
     //Model
     val text1: ObservableField<String> = ObservableField()
     val text2: Text2 = Text2()
+
+    //    val url = "https://iconfont.alicdn.com/t/083f67b8-b930-4a31-8f42-060ce61942f0.png"
+    val url = Image("https://iconfont.alicdn.com/t/083f67b8-b930-4a31-8f42-060ce61942f0.png", 0, 0)
 
     private var times = 1
 

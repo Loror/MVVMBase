@@ -1,7 +1,6 @@
 package com.loror.mvvmbase.view
 
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
