@@ -46,8 +46,8 @@ public class BaseViewModel extends ViewModel {
         }
     }
 
-    private final MutableLiveData<LiveDataEvent> liveData = new MutableLiveData<>();
-    private final List<LifecycleOwner> attached = new ArrayList<>();
+    protected final MutableLiveData<LiveDataEvent> liveData = new MutableLiveData<>();
+    protected final List<LifecycleOwner> attached = new ArrayList<>();
 
     @Override
     protected void onCleared() {
