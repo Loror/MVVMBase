@@ -94,6 +94,9 @@ public class BaseViewModel extends ViewModel {
         }
         liveData.observe(view, liveDataEvent -> {
             Method method = events.get(liveDataEvent.getCode());
+            if (eventIntercept(liveDataEvent)) {
+                return;
+            }
             if (liveDataEvent.getCode() == EVENT_SUCCESS || liveDataEvent.getCode() == EVENT_FAILED) {
                 if (method == null) {
                     return;
@@ -127,6 +130,13 @@ public class BaseViewModel extends ViewModel {
                 Log.e("执行事件失败", "e:", e);
             }
         }
+    }
+
+    /**
+     * LiveDataEvent时间拦截，返回true时拦截
+     */
+    protected boolean eventIntercept(LiveDataEvent event) {
+        return false;
     }
 
     /**
