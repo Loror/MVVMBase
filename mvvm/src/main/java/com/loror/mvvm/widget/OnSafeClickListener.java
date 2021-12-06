@@ -5,12 +5,17 @@ import android.view.View;
 
 public class OnSafeClickListener implements View.OnClickListener {
 
-    final int CLICK_SPACE = 800;
+    final int CLICK_SPACE;
 
     private long click;
     private final View.OnClickListener l;
 
     public OnSafeClickListener(View.OnClickListener l) {
+        this(800, l);
+    }
+
+    public OnSafeClickListener(int space, View.OnClickListener l) {
+        this.CLICK_SPACE = space;
         this.l = l;
     }
 
@@ -24,8 +29,16 @@ public class OnSafeClickListener implements View.OnClickListener {
                     l.onClick(v);
                 } catch (Throwable e) {
                     e.printStackTrace();
+                    onError(e);
                 }
             }
         }
+    }
+
+    /**
+     * 当发生异常
+     */
+    protected void onError(Throwable e) {
+
     }
 }
