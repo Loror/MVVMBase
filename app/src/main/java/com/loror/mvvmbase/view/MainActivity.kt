@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.loror.mvvm.annotation.LiveDataEvent
+import com.loror.mvvm.annotation.Sign
 import com.loror.mvvm.core.MvvmViewModel
 import com.loror.mvvmbase.R
 import com.loror.mvvmbase.adapter.ListAdapter
@@ -14,20 +15,17 @@ import com.loror.mvvmbase.viewModel.MainViewModel
 
 class MainActivity : BaseActivity() {
 
+    @Sign
     private lateinit var binding: ActivityMainBinding
+
+    @Sign
     private lateinit var viewModel: MainViewModel
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        binding.viewModel = viewModel//绑定viewModel
-        viewModel.attachView(this)
-        viewModel.listenLifeCycle(this)
-        initView()
+    override fun getLayout(): Int {
+        return R.layout.activity_main
     }
 
-    private fun initView() {
+    override fun initView(savedInstanceState: Bundle?) {
         binding.adapter = ListAdapter(this)//绑定adapter
         binding.net.setOnClickListener {
             viewModel.netBaidu()

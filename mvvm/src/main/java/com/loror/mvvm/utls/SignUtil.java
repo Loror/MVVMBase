@@ -38,19 +38,7 @@ public class SignUtil {
             if (sign == null) {
                 continue;
             }
-            if (ViewDataBinding.class.isAssignableFrom(field.getType())) {
-                field.setAccessible(true);
-                try {
-                    if (Modifier.isStatic(field.getModifiers())) {
-                        field.set(obj.getClass(), binding);
-                    } else {
-                        field.set(obj, binding);
-                    }
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                    break;
-                }
-            } else if (MvvmViewModel.class.isAssignableFrom(field.getType())) {
+            if (MvvmViewModel.class.isAssignableFrom(field.getType())) {
                 if (obj instanceof LifecycleOwner && obj instanceof ViewModelStoreOwner) {
                     field.setAccessible(true);
                     try {
@@ -65,6 +53,18 @@ public class SignUtil {
                         e.printStackTrace();
                         break;
                     }
+                }
+            } else if (ViewDataBinding.class.isAssignableFrom(field.getType())) {
+                field.setAccessible(true);
+                try {
+                    if (Modifier.isStatic(field.getModifiers())) {
+                        field.set(obj.getClass(), binding);
+                    } else {
+                        field.set(obj, binding);
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    break;
                 }
             } else if (field.getType() == Handler.class) {
                 field.setAccessible(true);
@@ -90,19 +90,7 @@ public class SignUtil {
                 continue;
             }
             Class<?> type = method.getParameterTypes()[0];
-            if (ViewDataBinding.class.isAssignableFrom(type)) {
-                method.setAccessible(true);
-                try {
-                    if (Modifier.isStatic(method.getModifiers())) {
-                        method.invoke(method.getDeclaringClass(), binding);
-                    } else {
-                        method.invoke(obj, binding);
-                    }
-                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    e.printStackTrace();
-                    break;
-                }
-            } else if (MvvmViewModel.class.isAssignableFrom(type)) {
+            if (MvvmViewModel.class.isAssignableFrom(type)) {
                 if (obj instanceof LifecycleOwner && obj instanceof ViewModelStoreOwner) {
                     method.setAccessible(true);
                     try {
@@ -117,6 +105,18 @@ public class SignUtil {
                         e.printStackTrace();
                         break;
                     }
+                }
+            } else if (ViewDataBinding.class.isAssignableFrom(type)) {
+                method.setAccessible(true);
+                try {
+                    if (Modifier.isStatic(method.getModifiers())) {
+                        method.invoke(method.getDeclaringClass(), binding);
+                    } else {
+                        method.invoke(obj, binding);
+                    }
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                    e.printStackTrace();
+                    break;
                 }
             } else if (type == Handler.class) {
                 method.setAccessible(true);
