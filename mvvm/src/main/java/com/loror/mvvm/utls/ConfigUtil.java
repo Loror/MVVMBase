@@ -46,14 +46,7 @@ public class ConfigUtil {
      */
     private static final List<Class<?>> found = new ArrayList<>();
     private static final Map<Class<?>, Method> apis = new HashMap<>();
-
-    /**
-     * ConfigApplication配置
-     */
-    public static void collect(ConfigApplication application) {
-        ConfigUtil.application = application;
-        collectStatic(application);
-    }
+    private static final Map<Class<?>, Method> exceptionHandler = new HashMap<>();
 
     /**
      * 获取ProgressDialog
@@ -107,6 +100,49 @@ public class ConfigUtil {
             }
         }
         return null;
+    }
+
+    /**
+     * 处理框架内部异常
+     */
+    public static void handlerException(Throwable t) {
+        if (t == null) {
+            return;
+        }
+        for (Map.Entry<Class<?>, Method> handler : exceptionHandler.entrySet()) {
+            if (handler.getKey().isAssignableFrom(t.getClass())) {
+                handler.getValue().setAccessible(true);
+                try {
+                    handler.getValue().invoke(application, t);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+        }
+    }
+
+    /**
+     * ConfigApplication配置
+     */
+    public static void collect(ConfigApplication application) {
+        ConfigUtil.application = application;
+        collectStatic(application);
+        Method[] methods = application.getClass().getMethods();
+        for (Method method : methods) {
+            if (Modifier.isStatic(method.getModifiers())) {
+                continue;
+            }
+            Config config = method.getAnnotation(Config.class);
+            if (config != null) {
+                if (method.getParameterTypes().length != 1) {
+                    continue;
+                }
+                if (Throwable.class.isAssignableFrom(method.getParameterTypes()[0])) {
+                    exceptionHandler.put(method.getParameterTypes()[0], method);
+                }
+            }
+        }
     }
 
     /**

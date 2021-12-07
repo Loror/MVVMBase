@@ -3,6 +3,8 @@ package com.loror.mvvm.widget;
 import android.os.SystemClock;
 import android.view.View;
 
+import com.loror.mvvm.utls.ConfigUtil;
+
 public class OnSafeClickListener implements View.OnClickListener {
 
     final int CLICK_SPACE;
@@ -39,6 +41,6 @@ public class OnSafeClickListener implements View.OnClickListener {
      * 当发生异常
      */
     protected void onError(Throwable e) {
-
+        ConfigUtil.handlerException(e);
     }
 }

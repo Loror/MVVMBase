@@ -11,7 +11,7 @@ import androidx.databinding.ViewDataBinding;
 
 import com.loror.mvvm.utls.SignUtil;
 
-public abstract class MvvmSignFragment extends MvvmFragment {
+public abstract class MvvmSignFragment extends MvvmFragment implements MvvmView {
 
     @Nullable
     @Override
@@ -26,14 +26,4 @@ public abstract class MvvmSignFragment extends MvvmFragment {
         initView(savedInstanceState);
         return view;
     }
-
-    /**
-     * 获取layout
-     */
-    public abstract int getLayout();
-
-    /**
-     * 初始化控件
-     */
-    public abstract void initView(@Nullable Bundle savedInstanceState);
 }

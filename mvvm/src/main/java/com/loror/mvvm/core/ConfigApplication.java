@@ -20,6 +20,10 @@ public abstract class ConfigApplication extends Application implements JsonParse
         super.onCreate();
         ConfigUtil.collect(this);
         SharedPreferenceUtil.init(this);
+        Thread.UncaughtExceptionHandler exceptionHandler = ConfigUtil.getExceptionHandler();
+        if (exceptionHandler != null) {
+
+        }
         initLororUtil();
         initActivity();
     }
