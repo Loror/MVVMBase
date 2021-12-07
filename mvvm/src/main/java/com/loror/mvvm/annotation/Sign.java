@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
  * 自动赋值
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
+@Target({ElementType.FIELD, ElementType.METHOD})
 public @interface Sign {
 }
