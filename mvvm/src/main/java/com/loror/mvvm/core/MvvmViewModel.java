@@ -14,16 +14,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BaseViewModel extends ViewModel {
+public class MvvmViewModel extends ViewModel {
 
     /**
-     * 默认成功事件，{@link BaseViewModel#success}触发
+     * 默认成功事件，{@link MvvmViewModel#success}触发
      */
     public static final int EVENT_SUCCESS = 0X9767;
     /**
-     * 默认失败事件，{@link BaseViewModel#failed}触发
+     * 默认失败事件，{@link MvvmViewModel#failed}触发
      */
     public static final int EVENT_FAILED = 0X9768;
+
+    /**
+     * 内部控制loading事件
+     */
+    private static final int EVENT_SHOW_PROGRESS = 0X9769;
+    private static final int EVENT_CLOSE_PROGRESS = 0X9770;
 
     /**
      * liveData传输数据
@@ -101,10 +107,33 @@ public class BaseViewModel extends ViewModel {
                 if (method == null) {
                     return;
                 }
+            } else if (liveDataEvent.getCode() == EVENT_SHOW_PROGRESS) {
+                Object value = liveDataEvent.getData();
+                if (view instanceof MvvmActivity) {
+                    if (value == null) {
+                        ((MvvmActivity) view).showProgress();
+                    } else {
+                        ((MvvmActivity) view).showProgress(String.valueOf(value));
+                    }
+                } else if (view instanceof MvvmFragment) {
+                    if (value == null) {
+                        ((MvvmFragment) view).showProgress();
+                    } else {
+                        ((MvvmFragment) view).showProgress(String.valueOf(value));
+                    }
+                }
+                return;
+            } else if (liveDataEvent.getCode() == EVENT_CLOSE_PROGRESS) {
+                if (view instanceof MvvmActivity) {
+                    ((MvvmActivity) view).dismissProgress();
+                } else if (view instanceof MvvmFragment) {
+                    ((MvvmFragment) view).dismissProgress();
+                }
+                return;
             } else {
                 if (method == null) {
                     Log.e("LiveDataEvent", "事件分发失败，code:" + liveDataEvent.getCode()
-                            + " model:" + BaseViewModel.this.getClass().getSimpleName());
+                            + " model:" + MvvmViewModel.this.getClass().getSimpleName());
                     return;
                 }
             }
@@ -133,7 +162,7 @@ public class BaseViewModel extends ViewModel {
     }
 
     /**
-     * LiveDataEvent时间拦截，返回true时拦截
+     * LiveDataEvent事件拦截，返回true时拦截
      */
     protected boolean eventIntercept(LiveDataEvent event, LifecycleOwner view) {
         return false;
@@ -151,6 +180,7 @@ public class BaseViewModel extends ViewModel {
      */
     @CallSuper
     public void failed(String message) {
+        dismissProgress();
         dispatchLiveDataEvent(EVENT_FAILED, message);
     }
 
@@ -159,7 +189,29 @@ public class BaseViewModel extends ViewModel {
      */
     @CallSuper
     public void success(String message) {
+        dismissProgress();
         dispatchLiveDataEvent(EVENT_SUCCESS, message);
+    }
+
+    /**
+     * 显示loading,使用默认内容
+     */
+    public void showProgress() {
+        showProgress(null);
+    }
+
+    /**
+     * 显示loading，可携带loading提示内容
+     */
+    public void showProgress(String message) {
+        liveData.setValue(new LiveDataEvent(EVENT_SHOW_PROGRESS, message));
+    }
+
+    /**
+     * 隐藏loading
+     */
+    public void dismissProgress() {
+        liveData.setValue(new LiveDataEvent(EVENT_CLOSE_PROGRESS, null));
     }
 
 }

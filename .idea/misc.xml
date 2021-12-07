@@ -4,6 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/work/WorkStudio/MVVMBase/app/src/main/res/layout/activity_main.xml" value="0.34791666666666665" />
+        <entry key="..\:/work/WorkStudio/MVVMBase/mvvm/src/main/res/drawable/message_box_bg.xml" value="0.40615384615384614" />
+        <entry key="..\:/work/WorkStudio/MVVMBase/mvvm/src/main/res/layout/dialog_progress_view.xml" value="0.3963541666666667" />
       </map>
     </option>
   </component>

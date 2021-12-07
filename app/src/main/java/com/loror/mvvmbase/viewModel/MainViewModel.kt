@@ -4,12 +4,12 @@ import androidx.databinding.ObservableField
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import com.loror.mvvm.core.BaseViewModel
+import com.loror.mvvm.core.MvvmViewModel
 import com.loror.mvvmbase.bean.Text2
 import com.loror.mvvmbase.model.MainModel
 import com.loror.mvvmbase.widget.toImage
 
-class MainViewModel : BaseViewModel(), LifecycleObserver {
+class MainViewModel : MvvmViewModel(), LifecycleObserver {
 
     companion object {
         const val EVENT_SHOW_BACK = 1

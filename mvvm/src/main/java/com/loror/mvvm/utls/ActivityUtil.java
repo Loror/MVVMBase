@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -63,6 +64,49 @@ public class ActivityUtil {
         });
     }
 
+    private static float compactDensity;
+    private static float compactScaleDensity;
+    private static int dpHalf;//suggest 190dp
+    private static float scaleFix = 1.0f;
+
+    /**
+     * 设置半屏像素
+     */
+    public static void setDpHalf(int dpHalf) {
+        ActivityUtil.dpHalf = dpHalf;
+    }
+
+    /**
+     * 屏幕适配
+     */
+    public static void setCustomDensity(Activity activity) {
+        if (dpHalf <= 0) {
+            return;
+        }
+        Application application = activity.getApplication();
+        DisplayMetrics appDisplayMetrics = application.getResources().getDisplayMetrics();
+        if (compactScaleDensity == 0) {
+            compactDensity = appDisplayMetrics.density;
+            compactScaleDensity = appDisplayMetrics.scaledDensity;
+            scaleFix = appDisplayMetrics.widthPixels / 2.0f / dpHalf;
+        }
+        float scale = appDisplayMetrics.widthPixels / 1080f;
+        float standardDensity = 3.0f * scale;
+        float standardDpi = 480 * scale;
+        float targetDensity = standardDensity / (standardDpi / appDisplayMetrics.densityDpi) * scaleFix;
+        float targetScaleDensity = (compactScaleDensity / compactDensity) * targetDensity;
+        if (targetScaleDensity < 0.5) {
+            targetScaleDensity = targetDensity;
+        }
+        appDisplayMetrics.density = targetDensity;
+//        appDisplayMetrics.densityDpi = targetDensityDpi;
+        appDisplayMetrics.scaledDensity = targetScaleDensity;
+        DisplayMetrics activityDisplayMetrics = activity.getResources().getDisplayMetrics();
+        activityDisplayMetrics.density = targetDensity;
+//        activityDisplayMetrics.densityDpi = targetDensityDpi;
+        activityDisplayMetrics.scaledDensity = targetScaleDensity;
+    }
+
     /**
      * 获取栈顶activity
      */
@@ -71,7 +115,7 @@ public class ActivityUtil {
     }
 
     /**
-     * 关闭所有界面
+     * 关闭界面
      */
     public static void finish(Class<? extends Activity> activity) {
         for (Activity a : activities) {
@@ -85,8 +129,9 @@ public class ActivityUtil {
      * 关闭所有界面
      */
     public static void finishAll(Class<? extends Activity>... exclude) {
+        List<Class<? extends Activity>> excludeList = exclude != null ? Arrays.asList(exclude) : null;
         for (Activity a : activities) {
-            if (exclude != null && Arrays.asList(exclude).contains(a.getClass())) {
+            if (excludeList != null && excludeList.contains(a.getClass())) {
                 continue;
             }
             a.finish();
@@ -162,5 +207,4 @@ public class ActivityUtil {
         }
         return false;
     }
-
 }

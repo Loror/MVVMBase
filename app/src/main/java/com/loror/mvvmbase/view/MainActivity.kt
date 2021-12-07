@@ -5,7 +5,7 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.loror.mvvm.annotation.LiveDataEvent
-import com.loror.mvvm.core.BaseViewModel
+import com.loror.mvvm.core.MvvmViewModel
 import com.loror.mvvmbase.R
 import com.loror.mvvmbase.adapter.ListAdapter
 import com.loror.mvvmbase.databinding.ActivityMainBinding
@@ -42,12 +42,12 @@ class MainActivity : BaseActivity() {
         binding.showBack.text = message
     }
 
-    @LiveDataEvent(BaseViewModel.EVENT_SUCCESS)
+    @LiveDataEvent(MvvmViewModel.EVENT_SUCCESS)
     fun success(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
-    @LiveDataEvent(BaseViewModel.EVENT_FAILED)
+    @LiveDataEvent(MvvmViewModel.EVENT_FAILED)
     fun failed(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }

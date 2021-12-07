@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">mvvm</string>
-    <string name="loading">Loading…</string>
+    <string name="loading">加载中…</string>
 </resources>
