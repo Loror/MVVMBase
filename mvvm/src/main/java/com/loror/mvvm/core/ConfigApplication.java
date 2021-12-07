@@ -8,6 +8,7 @@ import com.loror.lororUtil.http.api.MockData;
 import com.loror.lororUtil.view.ViewUtil;
 import com.loror.mvvm.utls.ActivityUtil;
 import com.loror.mvvm.utls.ConfigUtil;
+import com.loror.mvvm.utls.SharedPreferenceUtil;
 
 /**
  * 可配置Application
@@ -18,6 +19,7 @@ public abstract class ConfigApplication extends Application implements JsonParse
     public void onCreate() {
         super.onCreate();
         ConfigUtil.collect(this);
+        SharedPreferenceUtil.init(this);
         initLororUtil();
         initActivity();
     }
