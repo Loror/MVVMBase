@@ -22,10 +22,9 @@ public class SignUtil {
     /**
      * 为Sign注解字段赋值
      */
-    public static boolean sign(AppCompatActivity obj, int layoutResID) {
+    public static ViewDataBinding sign(AppCompatActivity obj, int layoutResID) {
         ViewDataBinding binding = DataBindingUtil.setContentView(obj, layoutResID);
         Field[] fields = obj.getClass().getDeclaredFields();
-        boolean result = false;
         for (Field field : fields) {
             if (ViewDataBinding.class.isAssignableFrom(field.getType())) {
                 Sign sign = field.getAnnotation(Sign.class);
@@ -37,7 +36,6 @@ public class SignUtil {
                         e.printStackTrace();
                         break;
                     }
-                    result = true;
                 }
             } else if (MvvmViewModel.class.isAssignableFrom(field.getType())) {
                 Sign sign = field.getAnnotation(Sign.class);
@@ -47,7 +45,6 @@ public class SignUtil {
                         MvvmViewModel viewModel = (MvvmViewModel) new ViewModelProvider(obj).get((Class) field.getType());
                         viewModel.attachView(obj);
                         field.set(obj, viewModel);
-                        result = true;
                     } catch (Exception e) {
                         e.printStackTrace();
                         break;
@@ -55,7 +52,7 @@ public class SignUtil {
                 }
             }
         }
-        return result;
+        return binding;
     }
 
     /**

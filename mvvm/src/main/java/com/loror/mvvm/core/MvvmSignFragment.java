@@ -27,7 +27,13 @@ public abstract class MvvmSignFragment extends MvvmFragment {
         return view;
     }
 
+    /**
+     * 获取layout
+     */
     public abstract int getLayout();
 
+    /**
+     * 初始化控件
+     */
     public abstract void initView(@Nullable Bundle savedInstanceState);
 }
