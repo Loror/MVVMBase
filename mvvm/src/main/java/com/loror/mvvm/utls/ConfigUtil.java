@@ -258,7 +258,9 @@ public class ConfigUtil {
                         } else {
                             Method find = globalStaticConfigs.get(method.getReturnType());
                             if (find != null) {
-                                throw new IllegalStateException(method.getReturnType().getName() + "类型已配置config，请勿重复配置");
+                                throw new IllegalStateException(method.getReturnType().getName() + "类型已配置config，请勿重复配置（"
+                                        + (method.getDeclaringClass().getName() + "." + method.getName()) + "<=>"
+                                        + (find.getDeclaringClass().getName() + "." + find.getName()) + "）");
                             }
                             globalStaticConfigs.put(method.getReturnType(), method);
                         }
