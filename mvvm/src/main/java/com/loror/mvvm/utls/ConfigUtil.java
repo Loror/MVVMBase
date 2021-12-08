@@ -212,17 +212,23 @@ public class ConfigUtil {
                     }
                     Config config = method.getAnnotation(Config.class);
                     if (config != null) {
-                        if (Activity.class.isAssignableFrom(method.getParameterTypes()[0])) {
+                        if (Activity.class.isAssignableFrom(method.getReturnType())) {
+                            if (method.getParameterTypes().length != 0) {
+                                continue;
+                            }
                             if (globalProgressDialogForActivity != null) {
                                 throw new IllegalStateException("Activity的ProgressDialog已配置，请保证唯一性");
                             }
                             globalProgressDialogForActivity = method;
-                        } else if (Fragment.class.isAssignableFrom(method.getParameterTypes()[0])) {
+                        } else if (Fragment.class.isAssignableFrom(method.getReturnType())) {
+                            if (method.getParameterTypes().length != 0) {
+                                continue;
+                            }
                             if (globalProgressDialogForFragment != null) {
                                 throw new IllegalStateException("Activity的ProgressDialog已配置，请保证唯一性");
                             }
                             globalProgressDialogForFragment = method;
-                        } else if (method.getReturnType().isInterface()) {
+                        } else {
                             Class<?>[] params = method.getParameterTypes();
                             try {
                                 method.setAccessible(true);
