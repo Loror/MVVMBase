@@ -124,6 +124,9 @@ public class ConfigUtil {
                 if ((paramsType.length == 1 && returnType == Void.TYPE) && Throwable.class.isAssignableFrom(paramsType[0])) {
                     exceptionHandler.put(method.getParameterTypes()[0], method);
                 } else if (returnType == Void.TYPE) {
+                    if (paramsType.length == 1) {
+                        throw new IllegalStateException(method.getName() + ":无返回值配置不应有参数");
+                    }
                     try {
                         method.setAccessible(true);
                         method.invoke(application);
@@ -236,6 +239,9 @@ public class ConfigUtil {
                         if ((paramsType.length == 1 && returnType == Void.TYPE) && Throwable.class.isAssignableFrom(paramsType[0])) {
                             exceptionHandler.put(method.getParameterTypes()[0], method);
                         } else if (returnType == Void.TYPE) {
+                            if (paramsType.length == 1) {
+                                throw new IllegalStateException(method.getName() + ":无返回值配置不应有参数");
+                            }
                             try {
                                 method.setAccessible(true);
                                 method.invoke(method.getDeclaringClass());
