@@ -21,14 +21,14 @@ public class SignUtil {
      * 为Sign注解字段赋值
      */
     public static void sign(Object obj, ViewDataBinding binding) {
-        signFieldAndMethod(obj, binding);
         signConfig(obj);
+        signSpecial(obj, binding);
     }
 
     /**
-     * 为Sign注解字段赋值
+     * 为Sign注解字段赋值，特殊类型
      */
-    private static void signFieldAndMethod(Object obj, ViewDataBinding binding) {
+    private static void signSpecial(Object obj, ViewDataBinding binding) {
         Field[] fields = obj.getClass().getDeclaredFields();
         for (Field field : fields) {
             Sign sign = field.getAnnotation(Sign.class);
@@ -110,7 +110,7 @@ public class SignUtil {
     }
 
     /**
-     * 为Sign注解api字段赋值
+     * 为Sign注解字段赋值
      */
     public static void signConfig(Object obj) {
         Field[] fields = obj.getClass().getDeclaredFields();
@@ -122,7 +122,7 @@ public class SignUtil {
             field.setAccessible(true);
             try {
                 if (field.get(obj) == null) {
-                    Object conf = ConfigUtil.getConfined(field.getType());
+                    Object conf = ConfigUtil.getConfined(field.getType(), obj);
                     if (conf != null) {
                         field.set(obj, conf);
                     }
@@ -141,7 +141,7 @@ public class SignUtil {
                 continue;
             }
             Class<?> type = method.getParameterTypes()[0];
-            Object conf = ConfigUtil.getConfined(type);
+            Object conf = ConfigUtil.getConfined(type, obj);
             if (conf != null) {
                 method.setAccessible(true);
                 try {

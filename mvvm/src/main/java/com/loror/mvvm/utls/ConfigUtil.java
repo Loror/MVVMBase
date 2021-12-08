@@ -6,7 +6,6 @@ import android.os.Handler;
 import androidx.fragment.app.Fragment;
 
 import com.loror.lororUtil.flyweight.ObjectPool;
-import com.loror.lororUtil.http.api.ApiClient;
 import com.loror.mvvm.annotation.Config;
 import com.loror.mvvm.core.ConfigApplication;
 import com.loror.mvvm.core.MvvmActivity;
@@ -32,22 +31,30 @@ public class ConfigUtil {
     private static ConfigApplication application;
 
     /**
-     * 全局生成loading配置
-     */
-    private static Method globalProgressDialogForActivity;
-    private static Method globalProgressDialogForFragment;
-    /**
-     * 单独生成loading配置
-     */
-    private static Method progressDialogForActivity;
-    private static Method progressDialogForFragment;
-
-    /**
      * 查找过配置的
      */
     private static final List<Class<?>> found = new ArrayList<>();
-    private static final Map<Class<?>, Object> configs = new HashMap<>();
+
+    /**
+     * 异常配置
+     */
     private static final Map<Class<?>, Method> exceptionHandler = new HashMap<>();
+
+    /**
+     * 全局配置
+     * key 赋值类型
+     * value configs：可用值 globalAppConfigs、globalStaticConfigs可用方法，参数数量1
+     */
+    private static final Map<Class<?>, Object> configs = new HashMap<>();
+    private static final Map<Class<?>, Method> globalAppConfigs = new HashMap<>();
+    private static final Map<Class<?>, Method> globalStaticConfigs = new HashMap<>();
+
+    /**
+     * 局部配置
+     * key 方法所属类类型
+     * value 可用方法，参数数量0
+     */
+    private static final Map<Class<?>, List<Method>> localConfigs = new HashMap<>();
 
     static {
         configs.put(Handler.class, ObjectPool.getInstance().getHandler());
@@ -57,54 +64,14 @@ public class ConfigUtil {
      * 获取ProgressDialog
      */
     public static ProgressDialog progressDialogForActivity(Activity activity) {
-        if (progressDialogForActivity != null) {
-            progressDialogForActivity.setAccessible(true);
-            try {
-                return (ProgressDialog) progressDialogForActivity.invoke(activity);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        if (globalProgressDialogForActivity != null) {
-            globalProgressDialogForActivity.setAccessible(true);
-            try {
-                if (Modifier.isStatic(globalProgressDialogForActivity.getModifiers())) {
-                    return (ProgressDialog) globalProgressDialogForActivity.invoke(globalProgressDialogForActivity.getDeclaringClass(), activity);
-                } else {
-                    return (ProgressDialog) globalProgressDialogForActivity.invoke(application, activity);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
+        return (ProgressDialog) getConfined(ProgressDialog.class, activity);
     }
 
     /**
      * 获取ProgressDialog
      */
     public static ProgressDialog progressDialogForFragment(Fragment fragment) {
-        if (progressDialogForFragment != null) {
-            progressDialogForFragment.setAccessible(true);
-            try {
-                return (ProgressDialog) progressDialogForFragment.invoke(fragment);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        if (globalProgressDialogForFragment != null) {
-            globalProgressDialogForFragment.setAccessible(true);
-            try {
-                if (Modifier.isStatic(globalProgressDialogForFragment.getModifiers())) {
-                    return (ProgressDialog) globalProgressDialogForFragment.invoke(globalProgressDialogForFragment.getDeclaringClass(), fragment);
-                } else {
-                    return (ProgressDialog) globalProgressDialogForFragment.invoke(application, fragment);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
+        return (ProgressDialog) getConfined(ProgressDialog.class, fragment);
     }
 
     /**
@@ -120,7 +87,11 @@ public class ConfigUtil {
                 find = true;
                 handler.getValue().setAccessible(true);
                 try {
-                    handler.getValue().invoke(application, t);
+                    if (Modifier.isStatic(handler.getValue().getModifiers())) {
+                        handler.getValue().invoke(handler.getValue().getDeclaringClass(), t);
+                    } else {
+                        handler.getValue().invoke(application, t);
+                    }
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
@@ -143,13 +114,35 @@ public class ConfigUtil {
             if (Modifier.isStatic(method.getModifiers())) {
                 continue;
             }
+            if (method.getParameterTypes().length > 1) {
+                continue;
+            }
             Config config = method.getAnnotation(Config.class);
             if (config != null) {
-                if (method.getParameterTypes().length != 1) {
-                    continue;
-                }
-                if (Throwable.class.isAssignableFrom(method.getParameterTypes()[0])) {
+                Class<?>[] paramsType = method.getParameterTypes();
+                Class<?> returnType = method.getReturnType();
+                if ((paramsType.length == 1 && returnType == Void.TYPE) && Throwable.class.isAssignableFrom(paramsType[0])) {
                     exceptionHandler.put(method.getParameterTypes()[0], method);
+                } else if (returnType == Void.TYPE) {
+                    try {
+                        method.setAccessible(true);
+                        method.invoke(application);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                } else if (paramsType.length == 0) {
+                    try {
+                        method.setAccessible(true);
+                        configs.put(returnType, method.invoke(application));
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Method find = globalAppConfigs.get(method.getReturnType());
+                    if (find != null) {
+                        throw new IllegalStateException(method.getReturnType().getName() + "类型已配置config，请勿重复配置");
+                    }
+                    globalAppConfigs.put(method.getReturnType(), method);
                 }
             }
         }
@@ -165,13 +158,26 @@ public class ConfigUtil {
             if (Modifier.isStatic(method.getModifiers())) {
                 continue;
             }
+            if (method.getParameterTypes().length != 0) {
+                continue;
+            }
             Config config = method.getAnnotation(Config.class);
             if (config != null) {
-                if (ProgressDialog.class.isAssignableFrom(method.getReturnType())) {
-                    if (method.getParameterTypes().length != 0) {
-                        continue;
+                Class<?> returnType = method.getReturnType();
+                if (returnType == Void.TYPE) {
+                    try {
+                        method.setAccessible(true);
+                        method.invoke(activity);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
                     }
-                    progressDialogForActivity = method;
+                } else {
+                    List<Method> methodList = localConfigs.get(activity.getClass());
+                    if (methodList == null) {
+                        methodList = new ArrayList<>();
+                        localConfigs.put(activity.getClass(), methodList);
+                    }
+                    methodList.add(method);
                 }
             }
         }
@@ -187,13 +193,26 @@ public class ConfigUtil {
             if (Modifier.isStatic(method.getModifiers())) {
                 continue;
             }
+            if (method.getParameterTypes().length != 0) {
+                continue;
+            }
             Config config = method.getAnnotation(Config.class);
             if (config != null) {
-                if (ProgressDialog.class.isAssignableFrom(method.getReturnType())) {
-                    if (method.getParameterTypes().length != 0) {
-                        continue;
+                Class<?> returnType = method.getReturnType();
+                if (returnType == Void.TYPE) {
+                    try {
+                        method.setAccessible(true);
+                        method.invoke(fragment);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
                     }
-                    progressDialogForFragment = method;
+                } else {
+                    List<Method> methodList = localConfigs.get(fragment.getClass());
+                    if (methodList == null) {
+                        methodList = new ArrayList<>();
+                        localConfigs.put(fragment.getClass(), methodList);
+                    }
+                    methodList.add(method);
                 }
             }
         }
@@ -212,34 +231,30 @@ public class ConfigUtil {
                     }
                     Config config = method.getAnnotation(Config.class);
                     if (config != null) {
-                        if (Activity.class.isAssignableFrom(method.getReturnType())) {
-                            if (method.getParameterTypes().length != 0) {
-                                continue;
-                            }
-                            if (globalProgressDialogForActivity != null) {
-                                throw new IllegalStateException("Activity的ProgressDialog已配置，请保证唯一性");
-                            }
-                            globalProgressDialogForActivity = method;
-                        } else if (Fragment.class.isAssignableFrom(method.getReturnType())) {
-                            if (method.getParameterTypes().length != 0) {
-                                continue;
-                            }
-                            if (globalProgressDialogForFragment != null) {
-                                throw new IllegalStateException("Activity的ProgressDialog已配置，请保证唯一性");
-                            }
-                            globalProgressDialogForFragment = method;
-                        } else {
-                            Class<?>[] params = method.getParameterTypes();
+                        Class<?>[] paramsType = method.getParameterTypes();
+                        Class<?> returnType = method.getReturnType();
+                        if ((paramsType.length == 1 && returnType == Void.TYPE) && Throwable.class.isAssignableFrom(paramsType[0])) {
+                            exceptionHandler.put(method.getParameterTypes()[0], method);
+                        } else if (returnType == Void.TYPE) {
                             try {
                                 method.setAccessible(true);
-                                if (params.length == 0) {
-                                    configs.put(method.getReturnType(), method.invoke(method.getDeclaringClass()));
-                                } else if (params.length == 1 && params[0] == ApiClient.class) {
-                                    configs.put(method.getReturnType(), method.invoke(method.getDeclaringClass(), new ApiClient()));
-                                }
+                                method.invoke(method.getDeclaringClass());
                             } catch (IllegalAccessException | InvocationTargetException e) {
                                 e.printStackTrace();
                             }
+                        } else if (paramsType.length == 0) {
+                            try {
+                                method.setAccessible(true);
+                                configs.put(returnType, method.invoke(method.getDeclaringClass()));
+                            } catch (IllegalAccessException | InvocationTargetException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            Method find = globalStaticConfigs.get(method.getReturnType());
+                            if (find != null) {
+                                throw new IllegalStateException(method.getReturnType().getName() + "类型已配置config，请勿重复配置");
+                            }
+                            globalStaticConfigs.put(method.getReturnType(), method);
                         }
                     }
                 }
@@ -250,9 +265,51 @@ public class ConfigUtil {
     }
 
     /**
-     * 获取api
+     * 获取Object
      */
-    protected static Object getConfined(Class<?> type) {
-        return configs.get(type);
+    protected static Object getConfined(Class<?> type, Object obj) {
+        Object data = configs.get(type);
+        if (data == null && obj != null) {
+            List<Method> methods = localConfigs.get(obj.getClass());
+            if (methods != null) {
+                for (Method method : methods) {
+                    if (method.getReturnType().isAssignableFrom(obj.getClass())) {
+                        try {
+                            data = method.invoke(obj);
+                            break;
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+        if (data == null && obj != null) {
+            Method method = globalAppConfigs.get(type);
+            if (method != null) {
+                Class<?> paramType = method.getParameterTypes()[0];
+                if (paramType.isAssignableFrom(obj.getClass())) {
+                    try {
+                        data = method.invoke(application, obj);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        if (data == null && obj != null) {
+            Method method = globalStaticConfigs.get(type);
+            if (method != null) {
+                Class<?> paramType = method.getParameterTypes()[0];
+                if (paramType.isAssignableFrom(obj.getClass())) {
+                    try {
+                        data = method.invoke(method.getDeclaringClass(), obj);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return data;
     }
 }
