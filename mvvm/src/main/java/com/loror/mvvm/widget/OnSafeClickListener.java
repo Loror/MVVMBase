@@ -3,6 +3,8 @@ package com.loror.mvvm.widget;
 import android.os.SystemClock;
 import android.view.View;
 
+import androidx.annotation.CallSuper;
+
 import com.loror.mvvm.utls.ConfigUtil;
 
 public class OnSafeClickListener implements View.OnClickListener {
@@ -30,7 +32,6 @@ public class OnSafeClickListener implements View.OnClickListener {
                 try {
                     l.onClick(v);
                 } catch (Throwable e) {
-                    e.printStackTrace();
                     onError(e);
                 }
             }
@@ -40,6 +41,7 @@ public class OnSafeClickListener implements View.OnClickListener {
     /**
      * 当发生异常
      */
+    @CallSuper
     protected void onError(Throwable e) {
         ConfigUtil.handlerException(e);
     }

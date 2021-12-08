@@ -19,7 +19,7 @@ public class MvvmFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ConfigUtil.collect(this);
+        ConfigUtil.config(this);
     }
 
     /**

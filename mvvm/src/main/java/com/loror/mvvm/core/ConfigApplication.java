@@ -18,7 +18,7 @@ public abstract class ConfigApplication extends Application implements JsonParse
     @Override
     public void onCreate() {
         super.onCreate();
-        ConfigUtil.collect(this);
+        ConfigUtil.config(this);
         SharedPreferenceUtil.init(this);
         initLororUtil();
         initActivity();

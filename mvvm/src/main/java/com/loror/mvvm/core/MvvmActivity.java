@@ -34,7 +34,7 @@ public class MvvmActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActivityUtil.setCustomDensity(this);
-        ConfigUtil.collect(this);
+        ConfigUtil.config(this);
         this.context = this;
     }
 

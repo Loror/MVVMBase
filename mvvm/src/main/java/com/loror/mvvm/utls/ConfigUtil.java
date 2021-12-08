@@ -1,9 +1,11 @@
 package com.loror.mvvm.utls;
 
 import android.app.Activity;
+import android.os.Handler;
 
 import androidx.fragment.app.Fragment;
 
+import com.loror.lororUtil.flyweight.ObjectPool;
 import com.loror.lororUtil.http.api.ApiClient;
 import com.loror.mvvm.annotation.Config;
 import com.loror.mvvm.core.ConfigApplication;
@@ -45,8 +47,12 @@ public class ConfigUtil {
      * 查找过配置的
      */
     private static final List<Class<?>> found = new ArrayList<>();
-    private static final Map<Class<?>, Method> apis = new HashMap<>();
+    private static final Map<Class<?>, Object> configs = new HashMap<>();
     private static final Map<Class<?>, Method> exceptionHandler = new HashMap<>();
+
+    static {
+        configs.put(Handler.class, ObjectPool.getInstance().getHandler());
+    }
 
     /**
      * 获取ProgressDialog
@@ -109,8 +115,10 @@ public class ConfigUtil {
         if (t == null) {
             return;
         }
+        boolean find = false;
         for (Map.Entry<Class<?>, Method> handler : exceptionHandler.entrySet()) {
             if (handler.getKey().isAssignableFrom(t.getClass())) {
+                find = true;
                 handler.getValue().setAccessible(true);
                 try {
                     handler.getValue().invoke(application, t);
@@ -120,14 +128,17 @@ public class ConfigUtil {
                 break;
             }
         }
+        if (!find) {
+            t.printStackTrace();
+        }
     }
 
     /**
      * ConfigApplication配置
      */
-    public static void collect(ConfigApplication application) {
+    public static void config(ConfigApplication application) {
         ConfigUtil.application = application;
-        collectStatic(application);
+        config(application.getClass());
         Method[] methods = application.getClass().getMethods();
         for (Method method : methods) {
             if (Modifier.isStatic(method.getModifiers())) {
@@ -148,8 +159,8 @@ public class ConfigUtil {
     /**
      * MvvmActivity配置
      */
-    public static void collect(MvvmActivity activity) {
-        collectStatic(activity);
+    public static void config(MvvmActivity activity) {
+        config(activity.getClass());
         Method[] methods = activity.getClass().getMethods();
         for (Method method : methods) {
             if (Modifier.isStatic(method.getModifiers())) {
@@ -170,8 +181,8 @@ public class ConfigUtil {
     /**
      * MvvmFragment配置
      */
-    public static void collect(MvvmFragment fragment) {
-        collectStatic(fragment);
+    public static void config(MvvmFragment fragment) {
+        config(fragment.getClass());
         Method[] methods = fragment.getClass().getMethods();
         for (Method method : methods) {
             if (Modifier.isStatic(method.getModifiers())) {
@@ -192,15 +203,14 @@ public class ConfigUtil {
     /**
      * MvvmModel配置
      */
-    public static void collect(MvvmModel model) {
-        collectStatic(model);
+    public static void config(MvvmModel model) {
+        config(model.getClass());
     }
 
     /**
      * 查找静态配置
      */
-    private static void collectStatic(Object obj) {
-        Class<?> type = obj.getClass();
+    public static void config(Class<?> type) {
         do {
             if (!found.contains(type)) {
                 Method[] methods = type.getDeclaredMethods();
@@ -222,8 +232,15 @@ public class ConfigUtil {
                             globalProgressDialogForFragment = method;
                         } else if (method.getReturnType().isInterface()) {
                             Class<?>[] params = method.getParameterTypes();
-                            if (params.length == 0 || (params.length == 1 && params[0] == ApiClient.class)) {
-                                apis.put(method.getReturnType(), method);
+                            try {
+                                method.setAccessible(true);
+                                if (params.length == 0) {
+                                    configs.put(method.getReturnType(), method.invoke(method.getDeclaringClass()));
+                                } else if (params.length == 1 && params[0] == ApiClient.class) {
+                                    configs.put(method.getReturnType(), method.invoke(method.getDeclaringClass(), new ApiClient()));
+                                }
+                            } catch (IllegalAccessException | InvocationTargetException e) {
+                                e.printStackTrace();
                             }
                         }
                     }
@@ -237,18 +254,7 @@ public class ConfigUtil {
     /**
      * 获取api
      */
-    protected static Object getApi(Class<?> type) {
-        Method method = apis.get(type);
-        if (method != null) {
-            method.setAccessible(true);
-            Class<?>[] params = method.getParameterTypes();
-            try {
-                return params.length == 0 ? method.invoke(method.getDeclaringClass())
-                        : method.invoke(method.getDeclaringClass(), new ApiClient());
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
+    protected static Object getConfined(Class<?> type) {
+        return configs.get(type);
     }
 }
