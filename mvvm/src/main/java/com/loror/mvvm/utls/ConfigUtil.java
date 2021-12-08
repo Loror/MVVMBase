@@ -43,7 +43,7 @@ public class ConfigUtil {
     /**
      * 全局配置
      * key 赋值类型
-     * value configs：可用值 globalAppConfigs、globalStaticConfigs可用方法，参数数量1
+     * value configs：可用值 globalAppConfigs、globalStaticConfigs可用方法，参数数量1（obj） 或 2（obj,String）
      */
     private static final Map<Class<?>, Object> configs = new HashMap<>();
     private static final Map<Class<?>, Method> globalAppConfigs = new HashMap<>();
@@ -52,7 +52,7 @@ public class ConfigUtil {
     /**
      * 局部配置
      * key 方法所属类类型
-     * value 可用方法，参数数量0
+     * value 可用方法，参数数量0 或 1（String）
      */
     private static final Map<Class<?>, List<Method>> localConfigs = new HashMap<>();
 
@@ -140,7 +140,7 @@ public class ConfigUtil {
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
-                } else {
+                } else if (paramsType.length == 1 || (paramsType.length == 2 && paramsType[1] == String.class)) {
                     Method find = globalAppConfigs.get(method.getReturnType());
                     if (find != null) {
                         throw new IllegalStateException(method.getReturnType().getName() + "类型已配置config，请勿重复配置");
@@ -161,7 +161,8 @@ public class ConfigUtil {
             if (Modifier.isStatic(method.getModifiers())) {
                 continue;
             }
-            if (method.getParameterTypes().length != 0) {
+            Class<?>[] paramsType = method.getParameterTypes();
+            if (method.getParameterTypes().length != 0 && (paramsType.length == 1 && paramsType[0] != String.class)) {
                 continue;
             }
             Config config = method.getAnnotation(Config.class);
@@ -196,7 +197,8 @@ public class ConfigUtil {
             if (Modifier.isStatic(method.getModifiers())) {
                 continue;
             }
-            if (method.getParameterTypes().length != 0) {
+            Class<?>[] paramsType = method.getParameterTypes();
+            if (method.getParameterTypes().length != 0 && (paramsType.length == 1 && paramsType[0] != String.class)) {
                 continue;
             }
             Config config = method.getAnnotation(Config.class);
@@ -255,7 +257,7 @@ public class ConfigUtil {
                             } catch (IllegalAccessException | InvocationTargetException e) {
                                 e.printStackTrace();
                             }
-                        } else {
+                        } else if (paramsType.length == 1 || (paramsType.length == 2 && paramsType[1] == String.class)) {
                             Method find = globalStaticConfigs.get(method.getReturnType());
                             if (find != null) {
                                 throw new IllegalStateException(method.getReturnType().getName() + "类型已配置config，请勿重复配置（"
@@ -276,6 +278,13 @@ public class ConfigUtil {
      * 获取Object
      */
     protected static Object getConfined(Class<?> type, Object obj) {
+        return getConfined(type, obj, null);
+    }
+
+    /**
+     * 获取Object
+     */
+    protected static Object getConfined(Class<?> type, Object obj, String fieldName) {
         Object data = configs.get(type);
         if (data == null && obj != null) {
             List<Method> methods = localConfigs.get(obj.getClass());
@@ -283,7 +292,11 @@ public class ConfigUtil {
                 for (Method method : methods) {
                     if (method.getReturnType().isAssignableFrom(obj.getClass())) {
                         try {
-                            data = method.invoke(obj);
+                            if (method.getParameterTypes().length == 0) {
+                                data = method.invoke(obj);
+                            } else {
+                                data = method.invoke(obj, fieldName);
+                            }
                             break;
                         } catch (IllegalAccessException | InvocationTargetException e) {
                             e.printStackTrace();
@@ -298,7 +311,11 @@ public class ConfigUtil {
                 Class<?> paramType = method.getParameterTypes()[0];
                 if (paramType.isAssignableFrom(obj.getClass())) {
                     try {
-                        data = method.invoke(application, obj);
+                        if (method.getParameterTypes().length == 1) {
+                            data = method.invoke(application, obj);
+                        } else {
+                            data = method.invoke(application, obj, fieldName);
+                        }
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
@@ -311,7 +328,11 @@ public class ConfigUtil {
                 Class<?> paramType = method.getParameterTypes()[0];
                 if (paramType.isAssignableFrom(obj.getClass())) {
                     try {
-                        data = method.invoke(method.getDeclaringClass(), obj);
+                        if (method.getParameterTypes().length == 1) {
+                            data = method.invoke(method.getDeclaringClass(), obj);
+                        } else {
+                            data = method.invoke(method.getDeclaringClass(), obj, fieldName);
+                        }
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
