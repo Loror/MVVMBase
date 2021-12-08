@@ -6,7 +6,7 @@ import com.loror.mvvm.utls.SignUtil;
 public class MvvmModel {
 
     {
-        ConfigUtil.config(this);
+        ConfigUtil.config(getClass());
         SignUtil.signConfig(this);
     }
 }

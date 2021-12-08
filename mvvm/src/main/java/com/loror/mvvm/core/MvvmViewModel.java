@@ -7,6 +7,9 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModel;
 
+import com.loror.mvvm.utls.ConfigUtil;
+import com.loror.mvvm.utls.SignUtil;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -30,6 +33,11 @@ public class MvvmViewModel extends ViewModel {
      */
     private static final int EVENT_SHOW_PROGRESS = 0X9769;
     private static final int EVENT_CLOSE_PROGRESS = 0X9770;
+
+    {
+        ConfigUtil.config(getClass());
+        SignUtil.signConfig(this);
+    }
 
     /**
      * liveData传输数据

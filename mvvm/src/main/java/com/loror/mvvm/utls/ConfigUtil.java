@@ -11,7 +11,6 @@ import com.loror.mvvm.annotation.Config;
 import com.loror.mvvm.core.ConfigApplication;
 import com.loror.mvvm.core.MvvmActivity;
 import com.loror.mvvm.core.MvvmFragment;
-import com.loror.mvvm.core.MvvmModel;
 import com.loror.mvvm.dialog.ProgressDialog;
 
 import java.lang.reflect.InvocationTargetException;
@@ -198,13 +197,6 @@ public class ConfigUtil {
                 }
             }
         }
-    }
-
-    /**
-     * MvvmModel配置
-     */
-    public static void config(MvvmModel model) {
-        config(model.getClass());
     }
 
     /**
