@@ -50,7 +50,7 @@ abstract class Action<T> : Observer<T> {
             }
             e?.printStackTrace()
         }
-        ConfigUtil.handlerMessage(message)
+        ConfigUtil.handler(message)
         failed(message)
     }
 

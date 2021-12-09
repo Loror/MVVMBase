@@ -11,7 +11,6 @@ import com.loror.mvvm.core.ConfigApplication;
 import com.loror.mvvm.core.MvvmActivity;
 import com.loror.mvvm.core.MvvmFragment;
 import com.loror.mvvm.dialog.ProgressDialog;
-import com.loror.mvvm.net.Message;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -47,8 +46,8 @@ public class ConfigUtil {
      * value configs：可用值 globalAppConfigs、globalStaticConfigs可用方法，参数数量1（obj） 或 2（obj,String）
      */
     private static final Map<Class<?>, Object> configs = new HashMap<>();
-    private static final Map<Class<?>, Method> globalAppConfigs = new HashMap<>();
-    private static final Map<Class<?>, Method> globalStaticConfigs = new HashMap<>();
+    private static final Map<Class<?>, List<Method>> globalAppConfigs = new HashMap<>();
+    private static final Map<Class<?>, List<Method>> globalStaticConfigs = new HashMap<>();
 
     /**
      * 局部配置
@@ -90,28 +89,6 @@ public class ConfigUtil {
                     handler.invoke(handler.getDeclaringClass(), data);
                 } else {
                     handler.invoke(application, data);
-                }
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * 处理框架内部net异常
-     */
-    public static void handlerMessage(Message message) {
-        if (message == null) {
-            return;
-        }
-        Method messageHandler = handlerConfigs.get(Message.class);
-        if (messageHandler != null) {
-            messageHandler.setAccessible(true);
-            try {
-                if (Modifier.isStatic(messageHandler.getModifiers())) {
-                    messageHandler.invoke(messageHandler.getDeclaringClass(), message);
-                } else {
-                    messageHandler.invoke(application, message);
                 }
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
@@ -183,11 +160,18 @@ public class ConfigUtil {
                         e.printStackTrace();
                     }
                 } else if (paramsType.length == 1 || (paramsType.length == 2 && paramsType[1] == String.class)) {
-                    Method find = globalAppConfigs.get(method.getReturnType());
-                    if (find != null && ArrayUtils.same(find.getParameterTypes(), method.getParameterTypes())) {
-                        throw new IllegalStateException(method.getReturnType().getName() + "类型已配置config，请勿重复配置");
+                    List<Method> find = globalAppConfigs.get(method.getReturnType());
+                    if (find != null) {
+                        for (Method item : find) {
+                            if (ArrayUtils.same(item.getParameterTypes(), method.getParameterTypes())) {
+                                throw new IllegalStateException(method.getReturnType().getName() + "类型已配置config，请勿重复配置");
+                            }
+                        }
+                    } else {
+                        find = new ArrayList<>();
+                        globalAppConfigs.put(method.getReturnType(), find);
                     }
-                    globalAppConfigs.put(method.getReturnType(), method);
+                    find.add(method);
                 }
             }
         }
@@ -297,13 +281,20 @@ public class ConfigUtil {
                                 e.printStackTrace();
                             }
                         } else if (paramsType.length == 1 || (paramsType.length == 2 && paramsType[1] == String.class)) {
-                            Method find = globalStaticConfigs.get(method.getReturnType());
-                            if (find != null && ArrayUtils.same(find.getParameterTypes(), method.getParameterTypes())) {
-                                throw new IllegalStateException(method.getReturnType().getName() + "类型已配置config，请勿重复配置（"
-                                        + (method.getDeclaringClass().getName() + "." + method.getName()) + "<=>"
-                                        + (find.getDeclaringClass().getName() + "." + find.getName()) + "）");
+                            List<Method> find = globalStaticConfigs.get(method.getReturnType());
+                            if (find != null) {
+                                for (Method item : find) {
+                                    if (ArrayUtils.same(item.getParameterTypes(), method.getParameterTypes())) {
+                                        throw new IllegalStateException(method.getReturnType().getName() + "类型已配置config，请勿重复配置（"
+                                                + (method.getDeclaringClass().getName() + "." + method.getName()) + "<=>"
+                                                + (item.getDeclaringClass().getName() + "." + item.getName()) + "）");
+                                    }
+                                }
+                            } else {
+                                find = new ArrayList<>();
+                                globalStaticConfigs.put(method.getReturnType(), find);
                             }
-                            globalStaticConfigs.put(method.getReturnType(), method);
+                            find.add(method);
                         }
                     }
                 }
@@ -345,19 +336,21 @@ public class ConfigUtil {
             }
         }
         if (data == null && obj != null) {
-            Method method = globalAppConfigs.get(type);
-            if (method != null) {
-                if (method.getReturnType().isAssignableFrom(obj.getClass())) {
+            List<Method> methods = globalAppConfigs.get(type);
+            if (methods != null) {
+                for (Method method : methods) {
                     Class<?> paramType = method.getParameterTypes()[0];
                     try {
                         if (method.getParameterTypes().length == 1 && paramType == String.class) {
                             data = method.invoke(application, fieldName);
+                            break;
                         } else if (paramType.isAssignableFrom(obj.getClass())) {
                             if (method.getParameterTypes().length == 1) {
                                 data = method.invoke(application, obj);
                             } else {
                                 data = method.invoke(application, obj, fieldName);
                             }
+                            break;
                         }
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
@@ -366,19 +359,21 @@ public class ConfigUtil {
             }
         }
         if (data == null && obj != null) {
-            Method method = globalStaticConfigs.get(type);
-            if (method != null) {
-                if (method.getReturnType().isAssignableFrom(obj.getClass())) {
+            List<Method> methods = globalStaticConfigs.get(type);
+            if (methods != null) {
+                for (Method method : methods) {
                     Class<?> paramType = method.getParameterTypes()[0];
                     try {
                         if (method.getParameterTypes().length == 1 && paramType == String.class) {
                             data = method.invoke(method.getDeclaringClass(), fieldName);
+                            break;
                         } else if (paramType.isAssignableFrom(obj.getClass())) {
                             if (method.getParameterTypes().length == 1) {
                                 data = method.invoke(method.getDeclaringClass(), obj);
                             } else {
                                 data = method.invoke(method.getDeclaringClass(), obj, fieldName);
                             }
+                            break;
                         }
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
