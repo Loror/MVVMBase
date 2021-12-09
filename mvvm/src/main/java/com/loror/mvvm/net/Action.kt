@@ -4,6 +4,7 @@ import android.text.TextUtils
 import android.util.Log
 import com.loror.lororUtil.http.api.Observer
 import com.loror.lororUtil.http.api.ResultException
+import com.loror.mvvm.utls.ConfigUtil
 import java.lang.Exception
 import java.net.ConnectException
 import java.net.SocketException
@@ -49,6 +50,7 @@ abstract class Action<T> : Observer<T> {
             }
             e?.printStackTrace()
         }
+        ConfigUtil.handlerMessage(message)
         failed(message)
     }
 

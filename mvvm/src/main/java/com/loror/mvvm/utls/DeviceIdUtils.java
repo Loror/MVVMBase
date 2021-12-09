@@ -28,8 +28,6 @@ public class DeviceIdUtils {
 
     private static final String TAG = DeviceIdUtils.class.getSimpleName();
 
-    private static final String SHARE_UUID = "uuid";
-
     private static final String TEMP_DIR = "system_config";
     private static final String TEMP_FILE_NAME = "system_file";
     private static final String TEMP_FILE_NAME_MIME_TYPE = "application/octet-stream";
@@ -60,10 +58,10 @@ public class DeviceIdUtils {
             e.printStackTrace();
         }
         if (TextUtils.isEmpty(uuid)) {
-            uuid = SharedPreferenceUtil.getString(SHARE_UUID);
+            uuid = SharedPreferenceUtil.getString("uuid");
             if (TextUtils.isEmpty(uuid)) {
                 uuid = UUID.randomUUID().toString().replace("-", "");
-                SharedPreferenceUtil.save(SHARE_UUID, uuid);
+                SharedPreferenceUtil.save("uuid", uuid);
             }
         }
         return uuid;

@@ -11,6 +11,7 @@ import com.loror.mvvm.core.ConfigApplication;
 import com.loror.mvvm.core.MvvmActivity;
 import com.loror.mvvm.core.MvvmFragment;
 import com.loror.mvvm.dialog.ProgressDialog;
+import com.loror.mvvm.net.Message;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -39,6 +40,7 @@ public class ConfigUtil {
      * 异常配置
      */
     private static final Map<Class<?>, Method> exceptionHandler = new HashMap<>();
+    private static Method messageHandler;
 
     /**
      * 全局配置
@@ -72,6 +74,27 @@ public class ConfigUtil {
      */
     public static ProgressDialog progressDialogForFragment(Fragment fragment) {
         return (ProgressDialog) getConfined(ProgressDialog.class, fragment);
+    }
+
+    /**
+     * 处理框架内部net异常
+     */
+    public static void handlerMessage(Message message) {
+        if (message == null) {
+            return;
+        }
+        if (messageHandler != null) {
+            messageHandler.setAccessible(true);
+            try {
+                if (Modifier.isStatic(messageHandler.getModifiers())) {
+                    messageHandler.invoke(messageHandler.getDeclaringClass(), message);
+                } else {
+                    messageHandler.invoke(application, message);
+                }
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -121,9 +144,16 @@ public class ConfigUtil {
             if (config != null) {
                 Class<?>[] paramsType = method.getParameterTypes();
                 Class<?> returnType = method.getReturnType();
-                if ((paramsType.length == 1 && returnType == Void.TYPE) && Throwable.class.isAssignableFrom(paramsType[0])) {
-                    exceptionHandler.put(method.getParameterTypes()[0], method);
-                } else if (returnType == Void.TYPE) {
+                if (paramsType.length == 1 && returnType == Void.TYPE) {
+                    if (Throwable.class.isAssignableFrom(paramsType[0])) {
+                        exceptionHandler.put(method.getParameterTypes()[0], method);
+                        continue;
+                    } else if (paramsType[0] == Message.class) {
+                        messageHandler = method;
+                        continue;
+                    }
+                }
+                if (returnType == Void.TYPE) {
                     if (paramsType.length == 1) {
                         throw new IllegalStateException(method.getName() + ":无返回值配置不应有参数");
                     }
@@ -238,9 +268,16 @@ public class ConfigUtil {
                     if (config != null) {
                         Class<?>[] paramsType = method.getParameterTypes();
                         Class<?> returnType = method.getReturnType();
-                        if ((paramsType.length == 1 && returnType == Void.TYPE) && Throwable.class.isAssignableFrom(paramsType[0])) {
-                            exceptionHandler.put(method.getParameterTypes()[0], method);
-                        } else if (returnType == Void.TYPE) {
+                        if (paramsType.length == 1 && returnType == Void.TYPE) {
+                            if (Throwable.class.isAssignableFrom(paramsType[0])) {
+                                exceptionHandler.put(method.getParameterTypes()[0], method);
+                                continue;
+                            } else if (paramsType[0] == Message.class) {
+                                messageHandler = method;
+                                continue;
+                            }
+                        }
+                        if (returnType == Void.TYPE) {
                             if (paramsType.length == 1) {
                                 throw new IllegalStateException(method.getName() + ":无返回值配置不应有参数");
                             }
