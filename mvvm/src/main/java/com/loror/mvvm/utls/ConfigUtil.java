@@ -184,7 +184,7 @@ public class ConfigUtil {
                     }
                 } else if (paramsType.length == 1 || (paramsType.length == 2 && paramsType[1] == String.class)) {
                     Method find = globalAppConfigs.get(method.getReturnType());
-                    if (find != null) {
+                    if (find != null && ArrayUtils.same(find.getParameterTypes(), method.getParameterTypes())) {
                         throw new IllegalStateException(method.getReturnType().getName() + "类型已配置config，请勿重复配置");
                     }
                     globalAppConfigs.put(method.getReturnType(), method);
@@ -298,7 +298,7 @@ public class ConfigUtil {
                             }
                         } else if (paramsType.length == 1 || (paramsType.length == 2 && paramsType[1] == String.class)) {
                             Method find = globalStaticConfigs.get(method.getReturnType());
-                            if (find != null) {
+                            if (find != null && ArrayUtils.same(find.getParameterTypes(), method.getParameterTypes())) {
                                 throw new IllegalStateException(method.getReturnType().getName() + "类型已配置config，请勿重复配置（"
                                         + (method.getDeclaringClass().getName() + "." + method.getName()) + "<=>"
                                         + (find.getDeclaringClass().getName() + "." + find.getName()) + "）");

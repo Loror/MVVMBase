@@ -20,4 +20,29 @@ public class ArrayUtils {
         }
         return -1;
     }
+
+    /**
+     * 判断数组中内容是否一致
+     *
+     * @param source 数组
+     * @param target 数组
+     * @return 是否一致
+     */
+    public static boolean same(Object[] source, Object[] target) {
+        if (source == null) {
+            return target == null;
+        }
+        if (target == null) {
+            return false;
+        }
+        if (source.length != target.length) {
+            return false;
+        }
+        for (int i = 0; i < source.length; i++) {
+            if (source[i] != target[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
