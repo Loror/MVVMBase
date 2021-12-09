@@ -24,9 +24,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.UUID;
 
-public class DeviceIdUtils {
+public class DeviceIdUtil {
 
-    private static final String TAG = DeviceIdUtils.class.getSimpleName();
+    private static final String TAG = DeviceIdUtil.class.getSimpleName();
 
     private static final String TEMP_DIR = "system_config";
     private static final String TEMP_FILE_NAME = "system_file";

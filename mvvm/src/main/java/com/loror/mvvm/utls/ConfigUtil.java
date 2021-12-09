@@ -37,10 +37,9 @@ public class ConfigUtil {
     private static final List<Class<?>> found = new ArrayList<>();
 
     /**
-     * 异常配置
+     * 配置
      */
-    private static final Map<Class<?>, Method> exceptionHandler = new HashMap<>();
-    private static Method messageHandler;
+    private static final Map<Class<?>, Method> handlerConfigs = new HashMap<>();
 
     /**
      * 全局配置
@@ -83,6 +82,7 @@ public class ConfigUtil {
         if (message == null) {
             return;
         }
+        Method messageHandler = handlerConfigs.get(Message.class);
         if (messageHandler != null) {
             messageHandler.setAccessible(true);
             try {
@@ -105,7 +105,7 @@ public class ConfigUtil {
             return;
         }
         boolean find = false;
-        for (Map.Entry<Class<?>, Method> handler : exceptionHandler.entrySet()) {
+        for (Map.Entry<Class<?>, Method> handler : handlerConfigs.entrySet()) {
             if (handler.getKey().isAssignableFrom(t.getClass())) {
                 find = true;
                 handler.getValue().setAccessible(true);
@@ -145,18 +145,8 @@ public class ConfigUtil {
                 Class<?>[] paramsType = method.getParameterTypes();
                 Class<?> returnType = method.getReturnType();
                 if (paramsType.length == 1 && returnType == Void.TYPE) {
-                    if (Throwable.class.isAssignableFrom(paramsType[0])) {
-                        exceptionHandler.put(method.getParameterTypes()[0], method);
-                        continue;
-                    } else if (paramsType[0] == Message.class) {
-                        messageHandler = method;
-                        continue;
-                    }
-                }
-                if (returnType == Void.TYPE) {
-                    if (paramsType.length == 1) {
-                        throw new IllegalStateException(method.getName() + ":无返回值配置不应有参数");
-                    }
+                    handlerConfigs.put(method.getParameterTypes()[0], method);
+                } else if (returnType == Void.TYPE) {
                     try {
                         method.setAccessible(true);
                         method.invoke(application);
@@ -269,18 +259,8 @@ public class ConfigUtil {
                         Class<?>[] paramsType = method.getParameterTypes();
                         Class<?> returnType = method.getReturnType();
                         if (paramsType.length == 1 && returnType == Void.TYPE) {
-                            if (Throwable.class.isAssignableFrom(paramsType[0])) {
-                                exceptionHandler.put(method.getParameterTypes()[0], method);
-                                continue;
-                            } else if (paramsType[0] == Message.class) {
-                                messageHandler = method;
-                                continue;
-                            }
-                        }
-                        if (returnType == Void.TYPE) {
-                            if (paramsType.length == 1) {
-                                throw new IllegalStateException(method.getName() + ":无返回值配置不应有参数");
-                            }
+                            handlerConfigs.put(method.getParameterTypes()[0], method);
+                        } else if (returnType == Void.TYPE) {
                             try {
                                 method.setAccessible(true);
                                 method.invoke(method.getDeclaringClass());
