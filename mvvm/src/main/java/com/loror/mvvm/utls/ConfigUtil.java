@@ -308,13 +308,17 @@ public class ConfigUtil {
         if (data == null && obj != null) {
             Method method = globalAppConfigs.get(type);
             if (method != null) {
-                Class<?> paramType = method.getParameterTypes()[0];
-                if (paramType.isAssignableFrom(obj.getClass())) {
+                if (method.getReturnType().isAssignableFrom(obj.getClass())) {
+                    Class<?> paramType = method.getParameterTypes()[0];
                     try {
-                        if (method.getParameterTypes().length == 1) {
-                            data = method.invoke(application, obj);
-                        } else {
-                            data = method.invoke(application, obj, fieldName);
+                        if (method.getParameterTypes().length == 1 && paramType == String.class) {
+                            data = method.invoke(application, fieldName);
+                        } else if (paramType.isAssignableFrom(obj.getClass())) {
+                            if (method.getParameterTypes().length == 1) {
+                                data = method.invoke(application, obj);
+                            } else {
+                                data = method.invoke(application, obj, fieldName);
+                            }
                         }
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
@@ -325,13 +329,17 @@ public class ConfigUtil {
         if (data == null && obj != null) {
             Method method = globalStaticConfigs.get(type);
             if (method != null) {
-                Class<?> paramType = method.getParameterTypes()[0];
-                if (paramType.isAssignableFrom(obj.getClass())) {
+                if (method.getReturnType().isAssignableFrom(obj.getClass())) {
+                    Class<?> paramType = method.getParameterTypes()[0];
                     try {
-                        if (method.getParameterTypes().length == 1) {
-                            data = method.invoke(method.getDeclaringClass(), obj);
-                        } else {
-                            data = method.invoke(method.getDeclaringClass(), obj, fieldName);
+                        if (method.getParameterTypes().length == 1 && paramType == String.class) {
+                            data = method.invoke(method.getDeclaringClass(), fieldName);
+                        } else if (paramType.isAssignableFrom(obj.getClass())) {
+                            if (method.getParameterTypes().length == 1) {
+                                data = method.invoke(method.getDeclaringClass(), obj);
+                            } else {
+                                data = method.invoke(method.getDeclaringClass(), obj, fieldName);
+                            }
                         }
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
