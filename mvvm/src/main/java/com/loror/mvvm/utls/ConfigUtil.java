@@ -76,6 +76,28 @@ public class ConfigUtil {
     }
 
     /**
+     * 处理配置
+     */
+    public static void handler(Object data) {
+        if (data == null) {
+            return;
+        }
+        Method handler = handlerConfigs.get(data.getClass());
+        if (handler != null) {
+            handler.setAccessible(true);
+            try {
+                if (Modifier.isStatic(handler.getModifiers())) {
+                    handler.invoke(handler.getDeclaringClass(), data);
+                } else {
+                    handler.invoke(application, data);
+                }
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
      * 处理框架内部net异常
      */
     public static void handlerMessage(Message message) {
