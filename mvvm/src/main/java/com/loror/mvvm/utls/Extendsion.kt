@@ -69,3 +69,7 @@ fun View.gone() {
 fun View.setOnSafeClickListener(l: View.OnClickListener) {
     this.setOnClickListener(OnSafeClickListener(l))
 }
+
+fun View.setOnSafeClickListener(space: Int, l: View.OnClickListener) {
+    this.setOnClickListener(OnSafeClickListener(space, l))
+}

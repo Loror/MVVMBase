@@ -3,9 +3,13 @@ package com.loror.mvvm.core;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +40,35 @@ public class MvvmActivity extends AppCompatActivity {
         ActivityUtil.setCustomDensity(this);
         ConfigUtil.config(this);
         this.context = this;
+    }
+
+    /**
+     * 亮色状态栏
+     */
+    protected boolean lightStatus() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 透明状态栏，6.0以上可同时配置使用亮色状态栏
+     */
+    protected boolean transparentStatus(boolean lightStatus) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Window window = this.getWindow();
+            if (lightStatus) {
+                window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            } else {
+                window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+            }
+            window.setStatusBarColor(Color.TRANSPARENT);
+        } else {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
+        return true;
     }
 
     /**
