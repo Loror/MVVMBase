@@ -64,14 +64,14 @@ public class ConfigUtil {
      * 获取ProgressDialog
      */
     public static ProgressDialog progressDialogForActivity(Activity activity) {
-        return (ProgressDialog) getConfined(ProgressDialog.class, activity);
+        return (ProgressDialog) getConfined(ProgressDialog.class, activity, null);
     }
 
     /**
      * 获取ProgressDialog
      */
     public static ProgressDialog progressDialogForFragment(Fragment fragment) {
-        return (ProgressDialog) getConfined(ProgressDialog.class, fragment);
+        return (ProgressDialog) getConfined(ProgressDialog.class, fragment, null);
     }
 
     /**
@@ -302,13 +302,6 @@ public class ConfigUtil {
             }
             type = type.getSuperclass();
         } while (type != null && type != Object.class && !type.getName().startsWith("com.loror.mvvm"));
-    }
-
-    /**
-     * 获取Object
-     */
-    protected static Object getConfined(Class<?> type, Object obj) {
-        return getConfined(type, obj, null);
     }
 
     /**
