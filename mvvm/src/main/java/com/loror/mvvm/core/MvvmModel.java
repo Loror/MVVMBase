@@ -21,6 +21,9 @@ public class MvvmModel {
      * 通知监听数据
      */
     protected void listen(DataBusReceiver receiver) {
+        if (this.receiver != null) {
+            DataBus.removeReceiver(this.receiver);
+        }
         DataBus.addReceiver(receiver);
     }
 

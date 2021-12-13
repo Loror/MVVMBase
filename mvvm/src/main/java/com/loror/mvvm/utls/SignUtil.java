@@ -18,6 +18,22 @@ import java.lang.reflect.Modifier;
 public class SignUtil {
 
     /**
+     * 手动注册@Sign支持的类型
+     */
+    public static <S, T extends S> void registerSign(Class<S> type, T data, boolean allowCover) {
+        if (type == null || data == null) {
+            return;
+        }
+        if (!allowCover) {
+            Object old = ConfigUtil.getSingletonConfig(type);
+            if (old != null) {
+                throw new IllegalArgumentException("type " + type.getName() + " is already registered");
+            }
+        }
+        ConfigUtil.addSingletonConfig(type, data);
+    }
+
+    /**
      * 为Sign注解字段赋值
      */
     public static void sign(Object obj, ViewDataBinding binding) {

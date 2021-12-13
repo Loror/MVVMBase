@@ -188,7 +188,7 @@ public class ConfigUtil {
                 continue;
             }
             Class<?>[] paramsType = method.getParameterTypes();
-            if (method.getParameterTypes().length != 0 && (paramsType.length == 1 && paramsType[0] != String.class)) {
+            if (method.getParameterTypes().length > 1 || (paramsType.length == 1 && paramsType[0] != String.class)) {
                 continue;
             }
             Config config = method.getAnnotation(Config.class);
@@ -224,7 +224,7 @@ public class ConfigUtil {
                 continue;
             }
             Class<?>[] paramsType = method.getParameterTypes();
-            if (method.getParameterTypes().length != 0 && (paramsType.length == 1 && paramsType[0] != String.class)) {
+            if (method.getParameterTypes().length > 1 || (paramsType.length == 1 && paramsType[0] != String.class)) {
                 continue;
             }
             Config config = method.getAnnotation(Config.class);
@@ -313,7 +313,7 @@ public class ConfigUtil {
             List<Method> methods = localConfigs.get(obj.getClass());
             if (methods != null) {
                 for (Method method : methods) {
-                    if (method.getReturnType().isAssignableFrom(obj.getClass())) {
+                    if (type.isAssignableFrom(method.getReturnType())) {
                         try {
                             if (method.getParameterTypes().length == 0) {
                                 data = method.invoke(obj);
@@ -375,5 +375,19 @@ public class ConfigUtil {
             }
         }
         return data;
+    }
+
+    /**
+     * 获取Object
+     */
+    protected static Object getSingletonConfig(Class<?> type) {
+        return configs.get(type);
+    }
+
+    /**
+     * 添加Object
+     */
+    protected static void addSingletonConfig(Class<?> type, Object data) {
+        configs.put(type, data);
     }
 }
