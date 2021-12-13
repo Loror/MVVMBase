@@ -11,6 +11,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 
+import com.loror.mvvm.utls.ConfigUtil;
 import com.loror.mvvm.utls.ScreenUtil;
 
 public class MvvmDialog extends Dialog {
@@ -23,6 +24,7 @@ public class MvvmDialog extends Dialog {
     public MvvmDialog(@NonNull Context context, int themeResId) {
         super(context, themeResId);
         this.context = context;
+        ConfigUtil.config(getClass());
     }
 
     /**
