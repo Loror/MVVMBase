@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 
 import com.loror.lororUtil.flyweight.ObjectPool;
 import com.loror.mvvm.annotation.Config;
+import com.loror.mvvm.bean.SignInfo;
 import com.loror.mvvm.core.ConfigApplication;
 import com.loror.mvvm.core.MvvmActivity;
 import com.loror.mvvm.core.MvvmFragment;
@@ -43,7 +44,7 @@ public class ConfigUtil {
     /**
      * 全局配置
      * key 赋值类型
-     * value configs：可用值 globalAppConfigs、globalStaticConfigs可用方法，参数数量1（obj） 或 2（obj,String）
+     * value configs：可用值 globalAppConfigs、globalStaticConfigs可用方法，参数数量1（obj） 或 2（obj,SignInfo）
      */
     private static final Map<Class<?>, Object> configs = new HashMap<>();
     private static final Map<Class<?>, List<Method>> globalAppConfigs = new HashMap<>();
@@ -159,7 +160,7 @@ public class ConfigUtil {
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
-                } else if (paramsType.length == 1 || (paramsType.length == 2 && paramsType[1] == String.class)) {
+                } else if (paramsType.length == 1 || (paramsType.length == 2 && paramsType[1] == SignInfo.class)) {
                     List<Method> find = globalAppConfigs.get(method.getReturnType());
                     if (find != null) {
                         for (Method item : find) {
@@ -188,7 +189,7 @@ public class ConfigUtil {
                 continue;
             }
             Class<?>[] paramsType = method.getParameterTypes();
-            if (method.getParameterTypes().length > 1 || (paramsType.length == 1 && paramsType[0] != String.class)) {
+            if (method.getParameterTypes().length > 1 || (paramsType.length == 1 && paramsType[0] != SignInfo.class)) {
                 continue;
             }
             Config config = method.getAnnotation(Config.class);
@@ -224,7 +225,7 @@ public class ConfigUtil {
                 continue;
             }
             Class<?>[] paramsType = method.getParameterTypes();
-            if (method.getParameterTypes().length > 1 || (paramsType.length == 1 && paramsType[0] != String.class)) {
+            if (method.getParameterTypes().length > 1 || (paramsType.length == 1 && paramsType[0] != SignInfo.class)) {
                 continue;
             }
             Config config = method.getAnnotation(Config.class);
@@ -280,7 +281,7 @@ public class ConfigUtil {
                             } catch (IllegalAccessException | InvocationTargetException e) {
                                 e.printStackTrace();
                             }
-                        } else if (paramsType.length == 1 || (paramsType.length == 2 && paramsType[1] == String.class)) {
+                        } else if (paramsType.length == 1 || (paramsType.length == 2 && paramsType[1] == SignInfo.class)) {
                             List<Method> find = globalStaticConfigs.get(method.getReturnType());
                             if (find != null) {
                                 for (Method item : find) {
@@ -307,7 +308,7 @@ public class ConfigUtil {
     /**
      * 获取Object
      */
-    protected static Object getConfined(Class<?> type, Object obj, String fieldName) {
+    protected static Object getConfined(Class<?> type, Object obj, SignInfo signInfo) {
         Object data = configs.get(type);
         if (data == null && obj != null) {
             List<Method> methods = localConfigs.get(obj.getClass());
@@ -318,7 +319,7 @@ public class ConfigUtil {
                             if (method.getParameterTypes().length == 0) {
                                 data = method.invoke(obj);
                             } else {
-                                data = method.invoke(obj, fieldName);
+                                data = method.invoke(obj, signInfo);
                             }
                             break;
                         } catch (IllegalAccessException | InvocationTargetException e) {
@@ -334,14 +335,14 @@ public class ConfigUtil {
                 for (Method method : methods) {
                     Class<?> paramType = method.getParameterTypes()[0];
                     try {
-                        if (method.getParameterTypes().length == 1 && paramType == String.class) {
-                            data = method.invoke(application, fieldName);
+                        if (method.getParameterTypes().length == 1 && paramType == SignInfo.class) {
+                            data = method.invoke(application, signInfo);
                             break;
                         } else if (paramType.isAssignableFrom(obj.getClass())) {
                             if (method.getParameterTypes().length == 1) {
                                 data = method.invoke(application, obj);
                             } else {
-                                data = method.invoke(application, obj, fieldName);
+                                data = method.invoke(application, obj, signInfo);
                             }
                             break;
                         }
@@ -357,14 +358,14 @@ public class ConfigUtil {
                 for (Method method : methods) {
                     Class<?> paramType = method.getParameterTypes()[0];
                     try {
-                        if (method.getParameterTypes().length == 1 && paramType == String.class) {
-                            data = method.invoke(method.getDeclaringClass(), fieldName);
+                        if (method.getParameterTypes().length == 1 && paramType == SignInfo.class) {
+                            data = method.invoke(method.getDeclaringClass(), signInfo);
                             break;
                         } else if (paramType.isAssignableFrom(obj.getClass())) {
                             if (method.getParameterTypes().length == 1) {
                                 data = method.invoke(method.getDeclaringClass(), obj);
                             } else {
-                                data = method.invoke(method.getDeclaringClass(), obj, fieldName);
+                                data = method.invoke(method.getDeclaringClass(), obj, signInfo);
                             }
                             break;
                         }

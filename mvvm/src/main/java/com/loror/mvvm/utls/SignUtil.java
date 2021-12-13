@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.loror.mvvm.annotation.Sign;
+import com.loror.mvvm.bean.SignInfo;
 import com.loror.mvvm.core.MvvmViewModel;
 
 import java.lang.reflect.Field;
@@ -138,7 +139,7 @@ public class SignUtil {
             field.setAccessible(true);
             try {
                 if (field.get(obj) == null) {
-                    Object conf = ConfigUtil.getConfined(field.getType(), obj, field.getName());
+                    Object conf = ConfigUtil.getConfined(field.getType(), obj, new SignInfo(field.getGenericType(), field.getName()));
                     if (conf != null) {
                         field.set(obj, conf);
                     }
@@ -162,7 +163,7 @@ public class SignUtil {
             if (name.length() > 0) {
                 name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
             }
-            Object conf = ConfigUtil.getConfined(type, obj, name);
+            Object conf = ConfigUtil.getConfined(type, obj, new SignInfo(method.getGenericParameterTypes()[0], name));
             if (conf != null) {
                 method.setAccessible(true);
                 try {
