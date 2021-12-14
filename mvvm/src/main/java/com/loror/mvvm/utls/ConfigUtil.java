@@ -116,7 +116,7 @@ public class ConfigUtil {
                         handler.getValue().invoke(application, t);
                     }
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
+                    ConfigUtil.handlerException(e);
                 }
                 break;
             }
@@ -158,7 +158,7 @@ public class ConfigUtil {
                         method.setAccessible(true);
                         configs.put(returnType, method.invoke(application));
                     } catch (IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
+                        ConfigUtil.handlerException(e);
                     }
                 } else if (paramsType.length == 1 || (paramsType.length == 2 && paramsType[1] == SignInfo.class)) {
                     List<Method> find = globalAppConfigs.get(method.getReturnType());
@@ -200,7 +200,7 @@ public class ConfigUtil {
                         method.setAccessible(true);
                         method.invoke(activity);
                     } catch (IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
+                        ConfigUtil.handlerException(e);
                     }
                 } else {
                     List<Method> methodList = localConfigs.get(activity.getClass());
@@ -236,7 +236,7 @@ public class ConfigUtil {
                         method.setAccessible(true);
                         method.invoke(fragment);
                     } catch (IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
+                        ConfigUtil.handlerException(e);
                     }
                 } else {
                     List<Method> methodList = localConfigs.get(fragment.getClass());
@@ -272,14 +272,14 @@ public class ConfigUtil {
                                 method.setAccessible(true);
                                 method.invoke(method.getDeclaringClass());
                             } catch (IllegalAccessException | InvocationTargetException e) {
-                                e.printStackTrace();
+                                ConfigUtil.handlerException(e);
                             }
                         } else if (paramsType.length == 0) {
                             try {
                                 method.setAccessible(true);
                                 configs.put(returnType, method.invoke(method.getDeclaringClass()));
                             } catch (IllegalAccessException | InvocationTargetException e) {
-                                e.printStackTrace();
+                                ConfigUtil.handlerException(e);
                             }
                         } else if (paramsType.length == 1 || (paramsType.length == 2 && paramsType[1] == SignInfo.class)) {
                             List<Method> find = globalStaticConfigs.get(method.getReturnType());
@@ -323,7 +323,7 @@ public class ConfigUtil {
                             }
                             break;
                         } catch (IllegalAccessException | InvocationTargetException e) {
-                            e.printStackTrace();
+                            ConfigUtil.handlerException(e);
                         }
                     }
                 }
@@ -347,7 +347,7 @@ public class ConfigUtil {
                             break;
                         }
                     } catch (IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
+                        ConfigUtil.handlerException(e);
                     }
                 }
             }
@@ -370,7 +370,7 @@ public class ConfigUtil {
                             break;
                         }
                     } catch (IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
+                        ConfigUtil.handlerException(e);
                     }
                 }
             }
