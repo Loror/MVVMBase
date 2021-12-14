@@ -32,11 +32,11 @@ class LogRequestListener(private val debug: Boolean) : OnRequestListener {
                 method = "DELETE"
             }
         }
-        val responce = result.responce
-        val url = result.url
-        val params = result.apiRequest.params
-        val resultStr = if (responce.inputStream == null) responce.toString() else "stream"
         if (debug) {
+            val responce = result.responce
+            val url = result.url
+            val params = result.apiRequest.params
+            val resultStr = if (responce.inputStream == null) responce.toString() else "stream"
             L.e(
                 "RESULT_",
                 "url:$url $method\nparam:$params\nresponse:${responce.code} ${resultStr}"
