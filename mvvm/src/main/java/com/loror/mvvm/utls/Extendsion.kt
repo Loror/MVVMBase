@@ -1,6 +1,7 @@
 package com.loror.mvvm.utls
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -22,8 +23,20 @@ fun Fragment.getCompatColor(res: Int): Int {
     }
 }
 
-fun String.mix(transform: ((String) -> String)): String {
-    return transform(this)
+fun Context.getCompatDrawable(res: Int): Drawable {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        this.getDrawable(res)!!
+    } else {
+        this.resources.getDrawable(res)
+    }
+}
+
+fun Fragment.getCompatDrawable(res: Int): Drawable {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        this.requireContext().getDrawable(res)!!
+    } else {
+        this.resources.getDrawable(res)
+    }
 }
 
 fun String.httpsPrefix(): String {

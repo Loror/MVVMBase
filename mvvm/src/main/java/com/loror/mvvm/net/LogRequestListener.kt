@@ -7,7 +7,7 @@ import com.loror.lororUtil.http.api.ApiResult
 import com.loror.lororUtil.http.api.OnRequestListener
 import com.loror.mvvm.utls.L
 
-class LogRequestListener : OnRequestListener {
+class LogRequestListener(private val debug: Boolean) : OnRequestListener {
 
     override fun onRequestBegin(client: HttpClient, request: ApiRequest) {
 
@@ -36,8 +36,12 @@ class LogRequestListener : OnRequestListener {
         val url = result.url
         val params = result.apiRequest.params
         val resultStr = if (responce.inputStream == null) responce.toString() else "stream"
-        L.e("RESULT_",
-            "url:$url $method\nparam:$params\nresponse:${responce.code} ${resultStr}")
+        if (debug) {
+            L.e(
+                "RESULT_",
+                "url:$url $method\nparam:$params\nresponse:${responce.code} ${resultStr}"
+            )
+        }
     }
 
 }

@@ -5,6 +5,7 @@ import com.loror.lororUtil.http.HttpClient
 import com.loror.lororUtil.http.api.*
 import com.loror.mvvm.net.CookieRequestListener
 import com.loror.mvvm.net.LogRequestListener
+import com.loror.mvvmbase.BuildConfig
 
 /**
  * Date: 2019/3/18 15:41
@@ -20,7 +21,7 @@ object ApiServiceUtil {
             .setOnRequestListener(
                 MultiOnRequestListener()
                     .addOnRequestListener(CookieRequestListener())
-                    .addOnRequestListener(LogRequestListener())
+                    .addOnRequestListener(LogRequestListener(BuildConfig.DEBUG))
                     .addOnRequestListener(object : OnRequestListener {
                         override fun onRequestBegin(client: HttpClient, request: ApiRequest) {
                             client.timeOut = 15000
