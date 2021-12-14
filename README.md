@@ -72,7 +72,7 @@ allprojects {
         return ProgressViewDialog(activity)
     }
     
-     @Config
+    @Config
     fun configProgress(fragment: Fragment): ProgressDialog {
         return ProgressViewDialog(fragment.requireContext())
     }
