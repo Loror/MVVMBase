@@ -97,6 +97,9 @@ public class PropertyUtil {
         if (source == null || target == null) {
             return;
         }
+        if (source.getClass() == Object.class || target.getClass() == Object.class) {
+            return;
+        }
         Filter filter = CURRENT_FILTER.get();
         if (filter == null) {
             copyWithIgnore(source, target);
@@ -269,7 +272,20 @@ public class PropertyUtil {
                 targetMethod.invoke(target, ((Date) sourceValue).getTime());
             }
         } else {
-            targetMethod.invoke(target, ReflectionUtil.convertValue(sourceValue, targetFieldType, exec));
+            Object targetValue = ReflectionUtil.convertValue(sourceValue, targetFieldType, exec);
+            if (targetValue != null) {
+                targetMethod.invoke(target, targetValue);
+            } else {
+                String fieldName = targetMethod.getName();
+                Method method = ReflectionUtil.findGetterMethodByFieldName(targetMethod.getDeclaringClass(), fieldName.substring(3));
+                if (method != null) {
+                    method.setAccessible(true);
+                    targetValue = method.invoke(target);
+                    if (targetValue != null) {
+                        copyProperties(sourceValue, targetValue);
+                    }
+                }
+            }
         }
     }
 
