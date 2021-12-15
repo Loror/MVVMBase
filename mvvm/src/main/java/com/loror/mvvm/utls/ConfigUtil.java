@@ -1,6 +1,7 @@
 package com.loror.mvvm.utls;
 
 import android.app.Activity;
+import android.app.Application;
 import android.os.Handler;
 
 import androidx.fragment.app.Fragment;
@@ -130,6 +131,8 @@ public class ConfigUtil {
      * ConfigApplication配置
      */
     public static void config(ConfigApplication application) {
+        configs.put(Application.class, application);
+        configs.put(application.getClass(), application);
         ConfigUtil.application = application;
         config(application.getClass());
         Method[] methods = application.getClass().getMethods();
@@ -314,7 +317,7 @@ public class ConfigUtil {
             List<Method> methods = localConfigs.get(obj.getClass());
             if (methods != null) {
                 for (Method method : methods) {
-                    if (type.isAssignableFrom(method.getReturnType())) {
+                    if (type == method.getReturnType()) {
                         try {
                             if (method.getParameterTypes().length == 0) {
                                 data = method.invoke(obj);
