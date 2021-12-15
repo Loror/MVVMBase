@@ -97,7 +97,7 @@ public class PropertyUtil {
         if (source == null || target == null) {
             return;
         }
-        if (source.getClass() == Object.class || target.getClass() == Object.class) {
+        if (cannotCopy(source) || cannotCopy(target)) {
             return;
         }
         Filter filter = CURRENT_FILTER.get();
@@ -111,6 +111,20 @@ public class PropertyUtil {
                 copyOnly(source, target, filter.fields);
             }
         }
+    }
+
+    /**
+     * 是否是不支持拷贝的类型
+     *
+     * @param obj 对象
+     * @return 结果
+     */
+    private static boolean cannotCopy(Object obj) {
+        Class<?> type = obj.getClass();
+        return type.isInterface() || type.isEnum() || type.isArray() || type.isAnnotation() || type == Object.class || type == String.class ||
+                type == Byte.class || type == Byte.TYPE || type == Short.class || type == Short.TYPE || type == Integer.class || type == Integer.TYPE ||
+                type == Long.class || type == Long.TYPE || type == Float.class || type == Float.TYPE || type == Double.class || type == Double.TYPE ||
+                type == Boolean.class || type == Boolean.TYPE;
     }
 
     /**
