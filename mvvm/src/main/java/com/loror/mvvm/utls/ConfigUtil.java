@@ -6,14 +6,23 @@ import android.os.Handler;
 
 import androidx.fragment.app.Fragment;
 
+import com.loror.lororUtil.annotation.BaseUrl;
 import com.loror.lororUtil.flyweight.ObjectPool;
+import com.loror.lororUtil.http.HttpClient;
+import com.loror.lororUtil.http.api.ApiClient;
+import com.loror.lororUtil.http.api.ApiRequest;
+import com.loror.lororUtil.http.api.ApiResult;
+import com.loror.lororUtil.http.api.MultiOnRequestListener;
+import com.loror.lororUtil.http.api.OnRequestListener;
 import com.loror.mvvm.annotation.Config;
+import com.loror.mvvm.annotation.Service;
 import com.loror.mvvm.bean.SignInfo;
 import com.loror.mvvm.core.ConfigApplication;
 import com.loror.mvvm.core.MvvmActivity;
 import com.loror.mvvm.core.MvvmFragment;
 import com.loror.mvvm.dialog.ProgressDialog;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -36,6 +45,10 @@ public class ConfigUtil {
      * 查找过配置的
      */
     private static final List<Class<?>> found = new ArrayList<>();
+    /**
+     * 查找过service的
+     */
+    private static final List<Class<?>> foundService = new ArrayList<>();
 
     /**
      * 配置
@@ -256,7 +269,7 @@ public class ConfigUtil {
     /**
      * 查找静态配置
      */
-    public static void config(Class<?> type) {
+    public static synchronized void config(Class<?> type) {
         do {
             if (!found.contains(type)) {
                 Method[] methods = type.getDeclaredMethods();
@@ -309,10 +322,86 @@ public class ConfigUtil {
     }
 
     /**
+     * 获取单例Object
+     */
+    private static synchronized Object getConstConfined(Class<?> type) {
+        Object data = configs.get(type);
+        if (data == null && !foundService.contains(type)) {
+            foundService.add(type);
+            Service service = type.getAnnotation(Service.class);
+            if (service != null) {
+                Class<?> generate = type;
+                if (type.isInterface()) {
+                    if (service.value() == Object.class) {
+                        MultiOnRequestListener multiOnRequestListener = new MultiOnRequestListener();
+                        multiOnRequestListener.addOnRequestListener(new OnRequestListener() {
+                            @Override
+                            public void onRequestBegin(HttpClient client, ApiRequest request) {
+                                handler(client);
+                                handler(request);
+                            }
+
+                            @Override
+                            public void onRequestEnd(HttpClient client, ApiResult result) {
+                                handler(result);
+                            }
+                        });
+                        handler(multiOnRequestListener);
+                        ApiClient apiClient = new ApiClient();
+                        handler(apiClient);
+                        data = apiClient.setOnRequestListener(multiOnRequestListener).create(type);
+                        configs.put(type, data);
+                    } else {
+                        if (!type.isAssignableFrom(service.value())) {
+                            throw new IllegalStateException(service.value().getName() + "未实现" + type.getName());
+                        }
+                        generate = service.value();
+                    }
+                }
+                if (Modifier.isAbstract(generate.getModifiers())) {
+                    throw new IllegalStateException("无法构造抽象类" + generate.getName());
+                }
+                Constructor<?>[] constructors = generate.getConstructors();
+                if (constructors.length == 1) {
+                    Constructor<?> constructor = constructors[0];
+                    try {
+                        constructor.setAccessible(true);
+                        Class<?>[] paramTypes = constructor.getParameterTypes();
+                        if (paramTypes.length == 0) {
+                            data = constructor.newInstance();
+                            SignUtil.signConfig(data);
+                        } else {
+                            Object[] args = new Object[paramTypes.length];
+                            for (int i = 0; i < paramTypes.length; i++) {
+                                Class<?> paramType = paramTypes[i];
+                                args[i] = getConstConfined(paramType);
+                                if (args[i] == null) {
+                                    throw new IllegalArgumentException(generate.getName() + "构造所需参数必须是以配置过类型");
+                                }
+                            }
+                            data = constructor.newInstance(args);
+                        }
+                        configs.put(type, data);
+                        if (type != generate) {
+                            configs.put(generate, data);
+                        } else if (type.getSuperclass() != null && type.getSuperclass().isInterface()) {
+                            configs.put(type.getSuperclass(), data);
+                        }
+                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                        handler(e);
+                    }
+                }
+            }
+        }
+        return data;
+    }
+
+    /**
      * 获取Object
      */
     protected static Object getConfined(Class<?> type, Object obj, SignInfo signInfo) {
-        Object data = configs.get(type);
+        Object data = getConstConfined(type);
         if (data == null && obj != null) {
             List<Method> methods = localConfigs.get(obj.getClass());
             if (methods != null) {
