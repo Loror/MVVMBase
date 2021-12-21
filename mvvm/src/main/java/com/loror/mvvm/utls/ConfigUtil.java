@@ -6,14 +6,9 @@ import android.os.Handler;
 
 import androidx.fragment.app.Fragment;
 
-import com.loror.lororUtil.annotation.BaseUrl;
 import com.loror.lororUtil.flyweight.ObjectPool;
-import com.loror.lororUtil.http.HttpClient;
 import com.loror.lororUtil.http.api.ApiClient;
-import com.loror.lororUtil.http.api.ApiRequest;
-import com.loror.lororUtil.http.api.ApiResult;
 import com.loror.lororUtil.http.api.MultiOnRequestListener;
-import com.loror.lororUtil.http.api.OnRequestListener;
 import com.loror.mvvm.annotation.Config;
 import com.loror.mvvm.annotation.Service;
 import com.loror.mvvm.bean.SignInfo;
@@ -334,18 +329,6 @@ public class ConfigUtil {
                 if (type.isInterface()) {
                     if (service.value() == Object.class) {
                         MultiOnRequestListener multiOnRequestListener = new MultiOnRequestListener();
-                        multiOnRequestListener.addOnRequestListener(new OnRequestListener() {
-                            @Override
-                            public void onRequestBegin(HttpClient client, ApiRequest request) {
-                                handler(client);
-                                handler(request);
-                            }
-
-                            @Override
-                            public void onRequestEnd(HttpClient client, ApiResult result) {
-                                handler(result);
-                            }
-                        });
                         handler(multiOnRequestListener);
                         ApiClient apiClient = new ApiClient();
                         handler(apiClient);
