@@ -11,6 +11,7 @@ import com.loror.lororUtil.http.api.ApiClient;
 import com.loror.lororUtil.http.api.MultiOnRequestListener;
 import com.loror.mvvm.annotation.Config;
 import com.loror.mvvm.annotation.Service;
+import com.loror.mvvm.bean.ApiInfo;
 import com.loror.mvvm.bean.SignInfo;
 import com.loror.mvvm.core.ConfigApplication;
 import com.loror.mvvm.core.MvvmActivity;
@@ -329,9 +330,12 @@ public class ConfigUtil {
                 if (type.isInterface()) {
                     if (service.value() == Object.class) {
                         MultiOnRequestListener multiOnRequestListener = new MultiOnRequestListener();
-                        handler(multiOnRequestListener);
                         ApiClient apiClient = new ApiClient();
-                        handler(apiClient);
+                        ApiInfo apiInfo = new ApiInfo();
+                        apiInfo.setApiClient(apiClient);
+                        apiInfo.setMultiOnRequestListener(multiOnRequestListener);
+                        apiInfo.setType(type);
+                        handler(apiInfo);
                         data = apiClient.setOnRequestListener(multiOnRequestListener).create(type);
                         configs.put(type, data);
                     } else {
