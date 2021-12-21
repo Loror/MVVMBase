@@ -4,12 +4,18 @@ import com.alibaba.fastjson.JSON
 import com.loror.lororUtil.http.api.TypeInfo
 import com.loror.mvvm.core.ConfigApplication
 import com.loror.mvvm.utls.AutoSign
+import com.loror.mvvm.utls.ConfigUtil
+import com.loror.mvvmbase.net.ApiConfig
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
-
 class App : ConfigApplication() {
+
+    override fun onCreate() {
+        super.onCreate()
+        ConfigUtil.config(ApiConfig::class.java)
+    }
 
     override fun jsonToObject(json: String?, typeInfo: TypeInfo?): Any {
         val classType = typeInfo!!.type
@@ -43,7 +49,7 @@ class App : ConfigApplication() {
     }
 
     override fun getIdClass(): Class<*> {
-       return R.id::class.java
+        return R.id::class.java
     }
 
     override fun getHalfPixel(): Int {

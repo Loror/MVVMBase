@@ -4,16 +4,16 @@ import com.loror.lororUtil.http.Responce
 import com.loror.mvvm.annotation.Sign
 import com.loror.mvvm.net.Action
 import com.loror.mvvm.net.Message
-import com.loror.mvvmbase.net.ServiceApi
+import com.loror.mvvmbase.service.ServiceTest
 import com.loror.mvvmbase.viewModel.MainViewModel
 
 class MainModel(private val viewModel: MainViewModel) : BaseModel() {
 
     @Sign
-    lateinit var serviceApi: ServiceApi
+    lateinit var serviceTest: ServiceTest
 
     fun netBaidu() {
-        serviceApi.baidu()
+        serviceTest.baidu()
             .subscribe(object : Action<Responce>() {
 
                 override fun failed(message: Message) {

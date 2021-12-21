@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import com.loror.lororUtil.flyweight.ObjectPool;
 import com.loror.lororUtil.http.api.ApiClient;
 import com.loror.lororUtil.http.api.MultiOnRequestListener;
+import com.loror.lororUtil.http.api.OnRequestListener;
 import com.loror.mvvm.annotation.Config;
 import com.loror.mvvm.annotation.Service;
 import com.loror.mvvm.bean.ApiInfo;
@@ -19,6 +20,7 @@ import com.loror.mvvm.core.MvvmFragment;
 import com.loror.mvvm.dialog.ProgressDialog;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -332,8 +334,21 @@ public class ConfigUtil {
                         ApiClient apiClient = new ApiClient();
                         ApiInfo apiInfo = new ApiInfo(apiClient, type);
                         handler(apiInfo);
-                        data = apiClient.setOnRequestListener(apiInfo.getMultiOnRequestListener()).create(type);
+                        OnRequestListener onRequestListener = apiInfo.getMultiOnRequestListener();
+                        try {
+                            Field field = ApiClient.class.getDeclaredField("onRequestListener");
+                            field.setAccessible(true);
+                            Object result = field.get(apiClient);
+                            if (result != null) {
+                                onRequestListener = (OnRequestListener) result;
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        apiClient.setOnRequestListener(onRequestListener);
+                        data = apiClient.create(type);
                         configs.put(type, data);
+                        return data;
                     } else {
                         if (!type.isAssignableFrom(service.value())) {
                             throw new IllegalStateException(service.value().getName() + "未实现" + type.getName());
