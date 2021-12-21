@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment;
 
 import com.loror.lororUtil.flyweight.ObjectPool;
 import com.loror.lororUtil.http.api.ApiClient;
-import com.loror.lororUtil.http.api.MultiOnRequestListener;
 import com.loror.lororUtil.http.api.OnRequestListener;
 import com.loror.mvvm.annotation.Config;
 import com.loror.mvvm.annotation.Service;
