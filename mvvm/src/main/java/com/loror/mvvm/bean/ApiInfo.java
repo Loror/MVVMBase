@@ -2,34 +2,39 @@ package com.loror.mvvm.bean;
 
 import com.loror.lororUtil.http.api.ApiClient;
 import com.loror.lororUtil.http.api.MultiOnRequestListener;
+import com.loror.lororUtil.http.api.OnRequestListener;
 
 public class ApiInfo {
 
-    private ApiClient apiClient;
+    private final ApiClient apiClient;
     private MultiOnRequestListener multiOnRequestListener;
-    private Class<?> type;
+    private final Class<?> type;
+
+    public ApiInfo(ApiClient apiClient, Class<?> type) {
+        this.apiClient = apiClient;
+        this.type = type;
+    }
 
     public ApiClient getApiClient() {
         return apiClient;
-    }
-
-    public void setApiClient(ApiClient apiClient) {
-        this.apiClient = apiClient;
     }
 
     public MultiOnRequestListener getMultiOnRequestListener() {
         return multiOnRequestListener;
     }
 
-    public void setMultiOnRequestListener(MultiOnRequestListener multiOnRequestListener) {
-        this.multiOnRequestListener = multiOnRequestListener;
+    public void addOnRequestListener(OnRequestListener onRequestListener) {
+        if (onRequestListener == null) {
+            return;
+        }
+        if (this.multiOnRequestListener == null) {
+            this.multiOnRequestListener = new MultiOnRequestListener();
+        }
+        this.multiOnRequestListener.addOnRequestListener(onRequestListener);
     }
 
     public Class<?> getType() {
         return type;
     }
 
-    public void setType(Class<?> type) {
-        this.type = type;
-    }
 }

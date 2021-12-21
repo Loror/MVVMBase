@@ -329,14 +329,10 @@ public class ConfigUtil {
                 Class<?> generate = type;
                 if (type.isInterface()) {
                     if (service.value() == Object.class) {
-                        MultiOnRequestListener multiOnRequestListener = new MultiOnRequestListener();
                         ApiClient apiClient = new ApiClient();
-                        ApiInfo apiInfo = new ApiInfo();
-                        apiInfo.setApiClient(apiClient);
-                        apiInfo.setMultiOnRequestListener(multiOnRequestListener);
-                        apiInfo.setType(type);
+                        ApiInfo apiInfo = new ApiInfo(apiClient, type);
                         handler(apiInfo);
-                        data = apiClient.setOnRequestListener(multiOnRequestListener).create(type);
+                        data = apiClient.setOnRequestListener(apiInfo.getMultiOnRequestListener()).create(type);
                         configs.put(type, data);
                     } else {
                         if (!type.isAssignableFrom(service.value())) {
