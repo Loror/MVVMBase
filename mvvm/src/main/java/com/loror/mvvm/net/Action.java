@@ -8,7 +8,6 @@ import com.loror.lororUtil.http.api.Observer;
 import com.loror.lororUtil.http.api.ResultException;
 import com.loror.mvvm.utls.ConfigUtil;
 
-import java.lang.Exception;
 import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
