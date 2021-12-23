@@ -19,7 +19,6 @@ import com.loror.mvvm.core.MvvmFragment;
 import com.loror.mvvm.dialog.ProgressDialog;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -334,17 +333,9 @@ public class ConfigUtil {
                         ApiInfo apiInfo = new ApiInfo(apiClient, type);
                         handler(apiInfo);
                         OnRequestListener onRequestListener = apiInfo.getMultiOnRequestListener();
-                        try {
-                            Field field = ApiClient.class.getDeclaredField("onRequestListener");
-                            field.setAccessible(true);
-                            Object result = field.get(apiClient);
-                            if (result != null) {
-                                onRequestListener = (OnRequestListener) result;
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        if (!apiClient.hasOnRequestListener()) {
+                            apiClient.setOnRequestListener(onRequestListener);
                         }
-                        apiClient.setOnRequestListener(onRequestListener);
                         data = apiClient.create(type);
                         configs.put(type, data);
                         return data;

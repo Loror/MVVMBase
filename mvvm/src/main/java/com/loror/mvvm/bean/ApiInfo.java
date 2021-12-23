@@ -23,6 +23,9 @@ public class ApiInfo {
         return multiOnRequestListener;
     }
 
+    /**
+     * 注意：如果直接通过ApiClient设置了OnRequestListener，这里的OnRequestListener将失效
+     */
     public void addOnRequestListener(OnRequestListener onRequestListener) {
         if (onRequestListener == null) {
             return;
