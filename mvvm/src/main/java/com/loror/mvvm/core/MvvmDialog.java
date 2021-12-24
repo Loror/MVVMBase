@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 
 import com.loror.mvvm.utls.ConfigUtil;
 import com.loror.mvvm.utls.ScreenUtil;
+import com.loror.mvvm.utls.SignUtil;
 
 public class MvvmDialog extends Dialog {
     private final Context context;
@@ -25,6 +26,9 @@ public class MvvmDialog extends Dialog {
         super(context, themeResId);
         this.context = context;
         ConfigUtil.config(getClass());
+        if (!(this instanceof MvvmSignDialog)) {
+            SignUtil.signConfig(this);
+        }
     }
 
     /**

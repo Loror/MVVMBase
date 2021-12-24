@@ -11,5 +11,14 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface Service {
+
+    /**
+     * 实现类
+     */
     Class<?> value() default Object.class;
+
+    /**
+     * 是否进入常量池
+     */
+    boolean intoPool() default true;
 }

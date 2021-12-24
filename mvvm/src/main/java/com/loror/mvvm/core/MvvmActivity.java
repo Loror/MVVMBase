@@ -23,6 +23,7 @@ import com.loror.mvvm.dialog.ProgressViewDialog;
 import com.loror.mvvm.utls.ActivityUtil;
 import com.loror.mvvm.utls.ConfigUtil;
 import com.loror.mvvm.utls.ScreenUtil;
+import com.loror.mvvm.utls.SignUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,9 @@ public class MvvmActivity extends AppCompatActivity {
         ActivityUtil.setCustomDensity(this);
         ConfigUtil.config(this);
         this.context = this;
+        if (!(this instanceof MvvmSignActivity)) {
+            SignUtil.signConfig(this);
+        }
     }
 
     /**

@@ -337,7 +337,9 @@ public class ConfigUtil {
                             apiClient.setOnRequestListener(onRequestListener);
                         }
                         data = apiClient.create(type);
-                        configs.put(type, data);
+                        if (service.intoPool()) {
+                            configs.put(type, data);
+                        }
                         return data;
                     } else {
                         if (!type.isAssignableFrom(service.value())) {
@@ -369,11 +371,13 @@ public class ConfigUtil {
                             }
                             data = constructor.newInstance(args);
                         }
-                        configs.put(type, data);
-                        if (type != generate) {
-                            configs.put(generate, data);
-                        } else if (type.getSuperclass() != null && type.getSuperclass().isInterface()) {
-                            configs.put(type.getSuperclass(), data);
+                        if (service.intoPool()) {
+                            configs.put(type, data);
+                            if (type != generate) {
+                                configs.put(generate, data);
+                            } else if (type.getSuperclass() != null && type.getSuperclass().isInterface()) {
+                                configs.put(type.getSuperclass(), data);
+                            }
                         }
                     } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();

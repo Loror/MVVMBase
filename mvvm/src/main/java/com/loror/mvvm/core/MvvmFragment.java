@@ -10,6 +10,7 @@ import com.loror.mvvm.R;
 import com.loror.mvvm.dialog.ProgressDialog;
 import com.loror.mvvm.dialog.ProgressViewDialog;
 import com.loror.mvvm.utls.ConfigUtil;
+import com.loror.mvvm.utls.SignUtil;
 
 public class MvvmFragment extends Fragment {
 
@@ -20,6 +21,9 @@ public class MvvmFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ConfigUtil.config(this);
+        if (!(this instanceof MvvmSignFragment)) {
+            SignUtil.signConfig(this);
+        }
     }
 
     /**
