@@ -152,7 +152,7 @@ public class SignUtil {
                 e.printStackTrace();
             }
         }
-        Method[] methods = obj.getClass().getMethods();
+        Method[] methods = (isStatic ? ((Class<?>) obj) : obj.getClass()).getMethods();
         for (Method method : methods) {
             if (isStatic && !Modifier.isStatic(method.getModifiers())) {
                 continue;
