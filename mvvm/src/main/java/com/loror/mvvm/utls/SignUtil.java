@@ -130,8 +130,12 @@ public class SignUtil {
      * 为Sign注解字段赋值
      */
     public static void signConfig(Object obj) {
-        Field[] fields = obj.getClass().getDeclaredFields();
+        boolean isStatic = obj instanceof Class;
+        Field[] fields = (isStatic ? ((Class<?>) obj) : obj.getClass()).getDeclaredFields();
         for (Field field : fields) {
+            if (isStatic && !Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
             Sign sign = field.getAnnotation(Sign.class);
             if (sign == null) {
                 continue;
@@ -150,6 +154,9 @@ public class SignUtil {
         }
         Method[] methods = obj.getClass().getMethods();
         for (Method method : methods) {
+            if (isStatic && !Modifier.isStatic(method.getModifiers())) {
+                continue;
+            }
             if (!method.getName().startsWith("set") || method.getParameterTypes().length != 1) {
                 continue;
             }
