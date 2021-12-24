@@ -51,6 +51,7 @@ public abstract class ConfigApplication extends Application implements JsonParse
     protected void initActivity() {
         ActivityUtil.register(this);
         ActivityUtil.setDpHalf(getHalfPixel());
+        ActivityUtil.setCustomDensity(this);
     }
 
 }

@@ -3,6 +3,7 @@ package com.loror.mvvm.utls;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 
@@ -64,10 +65,42 @@ public class ActivityUtil {
         });
     }
 
-    private static float compactDensity;
-    private static float compactScaleDensity;
+    /**
+     * 屏幕适配信息
+     */
+    private static class CustomInfo {
+
+        //原始数据
+        private float compactDensity;
+        private float compactScaleDensity;
+
+        //计算数据
+        private float targetDensity;
+        private float targetScaleDensity;
+
+        /**
+         * 计算适配信息
+         */
+        private static CustomInfo calculateCustomInfo(DisplayMetrics displayMetrics) {
+            CustomInfo customInfo = new CustomInfo();
+            customInfo.compactDensity = displayMetrics.density;
+            customInfo.compactScaleDensity = displayMetrics.scaledDensity;
+            float scaleFix = displayMetrics.widthPixels / 2.0f / dpHalf;
+            float scale = displayMetrics.widthPixels / 1080f;
+            float standardDensity = 3.0f * scale;
+            float standardDpi = 480 * scale;
+            customInfo.targetDensity = standardDensity / (standardDpi / displayMetrics.densityDpi) * scaleFix;
+            customInfo.targetScaleDensity = (customInfo.compactScaleDensity / customInfo.compactDensity) * customInfo.targetDensity;
+            if (customInfo.targetScaleDensity < 0.5) {
+                customInfo.targetScaleDensity = customInfo.targetDensity;
+            }
+            return customInfo;
+        }
+    }
+
+    private static CustomInfo customInfo;
     private static int dpHalf;//suggest 190dp
-    private static float scaleFix = 1.0f;
+
 
     /**
      * 设置半屏像素
@@ -77,34 +110,87 @@ public class ActivityUtil {
     }
 
     /**
-     * 屏幕适配
+     * 全局屏幕适配
      */
-    public static void setCustomDensity(Activity activity) {
+    public static void setGlobalCustomDensity(Activity activity) {
         if (dpHalf <= 0) {
             return;
         }
         Application application = activity.getApplication();
         DisplayMetrics appDisplayMetrics = application.getResources().getDisplayMetrics();
-        if (compactScaleDensity == 0) {
-            compactDensity = appDisplayMetrics.density;
-            compactScaleDensity = appDisplayMetrics.scaledDensity;
-            scaleFix = appDisplayMetrics.widthPixels / 2.0f / dpHalf;
+        if (customInfo == null) {
+            customInfo = CustomInfo.calculateCustomInfo(appDisplayMetrics);
         }
-        float scale = appDisplayMetrics.widthPixels / 1080f;
-        float standardDensity = 3.0f * scale;
-        float standardDpi = 480 * scale;
-        float targetDensity = standardDensity / (standardDpi / appDisplayMetrics.densityDpi) * scaleFix;
-        float targetScaleDensity = (compactScaleDensity / compactDensity) * targetDensity;
-        if (targetScaleDensity < 0.5) {
-            targetScaleDensity = targetDensity;
-        }
-        appDisplayMetrics.density = targetDensity;
-//        appDisplayMetrics.densityDpi = targetDensityDpi;
-        appDisplayMetrics.scaledDensity = targetScaleDensity;
+        appDisplayMetrics.density = customInfo.targetDensity;
+//        appDisplayMetrics.densityDpi = customInfo.targetDensityDpi;
+        appDisplayMetrics.scaledDensity = customInfo.targetScaleDensity;
         DisplayMetrics activityDisplayMetrics = activity.getResources().getDisplayMetrics();
-        activityDisplayMetrics.density = targetDensity;
+        activityDisplayMetrics.density = customInfo.targetDensity;
 //        activityDisplayMetrics.densityDpi = targetDensityDpi;
-        activityDisplayMetrics.scaledDensity = targetScaleDensity;
+        activityDisplayMetrics.scaledDensity = customInfo.targetScaleDensity;
+        DisplayMetrics defaultDisplayMetrics = Resources.getSystem().getDisplayMetrics();
+        if (defaultDisplayMetrics != null) {
+            defaultDisplayMetrics.density = customInfo.targetDensity;
+//        defaultDisplayMetrics.densityDpi = targetDensityDpi;
+            defaultDisplayMetrics.scaledDensity = customInfo.targetScaleDensity;
+        }
+    }
+
+    /**
+     * app级屏幕适配
+     */
+    public static void setCustomDensity(Application application) {
+        if (dpHalf <= 0) {
+            return;
+        }
+        DisplayMetrics appDisplayMetrics = application.getResources().getDisplayMetrics();
+        if (customInfo == null) {
+            customInfo = CustomInfo.calculateCustomInfo(appDisplayMetrics);
+        }
+        appDisplayMetrics.density = customInfo.targetDensity;
+//        appDisplayMetrics.densityDpi = customInfo.targetDensityDpi;
+        appDisplayMetrics.scaledDensity = customInfo.targetScaleDensity;
+        DisplayMetrics defaultDisplayMetrics = Resources.getSystem().getDisplayMetrics();
+        if (defaultDisplayMetrics != null) {
+            defaultDisplayMetrics.density = customInfo.targetDensity;
+//        defaultDisplayMetrics.densityDpi = customInfo.targetDensityDpi;
+            defaultDisplayMetrics.scaledDensity = customInfo.targetScaleDensity;
+        }
+    }
+
+    /**
+     * activity屏幕适配
+     */
+    public static void setCustomDensity(Activity activity) {
+        if (dpHalf <= 0) {
+            return;
+        }
+        DisplayMetrics appDisplayMetrics = activity.getApplication().getResources().getDisplayMetrics();
+        if (customInfo == null) {
+            customInfo = CustomInfo.calculateCustomInfo(appDisplayMetrics);
+        }
+        appDisplayMetrics.density = customInfo.targetDensity;
+//        appDisplayMetrics.densityDpi = customInfo.targetDensityDpi;
+        appDisplayMetrics.scaledDensity = customInfo.targetScaleDensity;
+        DisplayMetrics activityDisplayMetrics = activity.getResources().getDisplayMetrics();
+        activityDisplayMetrics.density = customInfo.targetDensity;
+//        activityDisplayMetrics.densityDpi = customInfo.targetDensityDpi;
+        activityDisplayMetrics.scaledDensity = customInfo.targetScaleDensity;
+    }
+
+    /**
+     * displayMetrics屏幕适配
+     */
+    public static void setCustomDensity(DisplayMetrics displayMetrics) {
+        if (dpHalf <= 0) {
+            return;
+        }
+        if (customInfo == null) {
+            customInfo = CustomInfo.calculateCustomInfo(displayMetrics);
+        }
+        displayMetrics.density = customInfo.targetDensity;
+//        displayMetrics.densityDpi = customInfo.targetDensityDpi;
+        displayMetrics.scaledDensity = customInfo.targetScaleDensity;
     }
 
     /**
