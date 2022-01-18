@@ -201,6 +201,31 @@ public class ActivityUtil {
     }
 
     /**
+     * 获取activity
+     */
+    public static Activity get(Class<? extends Activity> activity) {
+        for (Activity a : activities) {
+            if (a.getClass() == activity) {
+                return a;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 获取activity
+     */
+    public static List<Activity> getAll(Class<? extends Activity> activity) {
+        List<Activity> result = new ArrayList<>();
+        for (Activity a : activities) {
+            if (a.getClass() == activity) {
+                result.add(a);
+            }
+        }
+        return result;
+    }
+
+    /**
      * 关闭界面
      */
     public static void finish(Class<? extends Activity> activity) {
