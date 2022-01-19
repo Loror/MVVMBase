@@ -143,7 +143,7 @@ public class SignUtil {
             field.setAccessible(true);
             try {
                 if (field.get(obj) == null) {
-                    Object conf = ConfigUtil.getConfined(field.getType(), obj, new SignInfo(field.getGenericType(), field.getAnnotations(), field.getName()));
+                    Object conf = ConfigUtil.getConfined(field.getType(), obj, new SignInfo(obj, field));
                     if (conf != null) {
                         field.set(obj, conf);
                     }
@@ -165,12 +165,7 @@ public class SignUtil {
                 continue;
             }
             Class<?> type = method.getParameterTypes()[0];
-            String name = method.getName();
-            name = name.substring(3);
-            if (name.length() > 0) {
-                name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
-            }
-            Object conf = ConfigUtil.getConfined(type, obj, new SignInfo(method.getGenericParameterTypes()[0], method.getAnnotations(), name));
+            Object conf = ConfigUtil.getConfined(type, obj, new SignInfo(obj, method));
             if (conf != null) {
                 method.setAccessible(true);
                 try {
