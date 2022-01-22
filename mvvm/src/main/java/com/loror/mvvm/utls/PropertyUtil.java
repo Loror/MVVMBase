@@ -88,7 +88,7 @@ public class PropertyUtil {
     }
 
     /**
-     * 拷贝对象属性，支持BaseEnum、LocalDate、LocalDateTime
+     * 拷贝对象属性
      *
      * @param source 数据源
      * @param target 数据目的
@@ -128,7 +128,7 @@ public class PropertyUtil {
     }
 
     /**
-     * 拷贝对象属性，支持BaseEnum、LocalDate、LocalDateTime
+     * 拷贝对象属性
      *
      * @param source 数据源
      * @param target 数据目的
@@ -204,7 +204,7 @@ public class PropertyUtil {
     }
 
     /**
-     * 拷贝对象属性，支持BaseEnum、LocalDate、LocalDateTime
+     * 拷贝对象属性
      *
      * @param source 数据源
      * @param target 数据目的

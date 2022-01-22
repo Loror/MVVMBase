@@ -320,7 +320,7 @@ public class ConfigUtil {
     /**
      * 获取单例Object
      */
-    private static synchronized Object getConstConfined(Class<?> type) {
+    private static synchronized Object getConstConfined(Class<?> type, Object obj) {
         Object data = configs.get(type);
         if (data == null && !foundService.contains(type)) {
             foundService.add(type);
@@ -364,9 +364,13 @@ public class ConfigUtil {
                             Object[] args = new Object[paramTypes.length];
                             for (int i = 0; i < paramTypes.length; i++) {
                                 Class<?> paramType = paramTypes[i];
-                                args[i] = getConstConfined(paramType);
+                                args[i] = getConstConfined(paramType, obj);
                                 if (args[i] == null) {
-                                    throw new IllegalArgumentException(generate.getName() + "构造所需参数必须是以配置过类型");
+                                    if (obj != null && paramType.isAssignableFrom(obj.getClass())) {
+                                        args[i] = obj;
+                                    } else {
+                                        throw new IllegalArgumentException(generate.getName() + "构造所需参数必须是已配置过类型");
+                                    }
                                 }
                             }
                             data = constructor.newInstance(args);
@@ -393,7 +397,7 @@ public class ConfigUtil {
      * 获取Object
      */
     protected static Object getConfined(Class<?> type, Object obj, SignInfo signInfo) {
-        Object data = getConstConfined(type);
+        Object data = getConstConfined(type, obj);
         if (data == null && obj != null) {
             List<Method> methods = localConfigs.get(obj.getClass());
             if (methods != null) {
