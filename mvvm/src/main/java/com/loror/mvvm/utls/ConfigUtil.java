@@ -326,6 +326,7 @@ public class ConfigUtil {
             foundService.add(type);
             Service service = type.getAnnotation(Service.class);
             if (service != null) {
+                boolean intoPool = service.intoPool();
                 Class<?> generate = type;
                 if (type.isInterface()) {
                     if (service.value() == Object.class) {
@@ -337,7 +338,7 @@ public class ConfigUtil {
                             apiClient.setOnRequestListener(onRequestListener);
                         }
                         data = apiClient.create(type);
-                        if (service.intoPool()) {
+                        if (intoPool) {
                             configs.put(type, data);
                         }
                         return data;
@@ -367,6 +368,7 @@ public class ConfigUtil {
                                 args[i] = getConstConfined(paramType, obj);
                                 if (args[i] == null) {
                                     if (obj != null && paramType.isAssignableFrom(obj.getClass())) {
+                                        intoPool = false;
                                         args[i] = obj;
                                     } else {
                                         throw new IllegalArgumentException(generate.getName() + "构造所需参数必须是已配置过类型");
@@ -375,7 +377,7 @@ public class ConfigUtil {
                             }
                             data = constructor.newInstance(args);
                         }
-                        if (service.intoPool()) {
+                        if (intoPool) {
                             configs.put(type, data);
                             if (type != generate) {
                                 configs.put(generate, data);

@@ -8,7 +8,7 @@ import com.loror.mvvm.net.Message
 import com.loror.mvvmbase.service.ServiceTest
 import com.loror.mvvmbase.viewModel.MainViewModel
 
-@Service(intoPool = false)
+@Service
 class MainModel(private val viewModel: MainViewModel) : BaseModel() {
 
     @Sign
