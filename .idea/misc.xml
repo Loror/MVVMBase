@@ -10,8 +10,10 @@
     </option>
   </component>
   <component name="EntryPointsManager">
-    <list size="1">
-      <item index="0" class="java.lang.String" itemvalue="com.loror.mvvm.annotation.Config" />
+    <list size="3">
+      <item index="0" class="java.lang.String" itemvalue="androidx.lifecycle.OnLifecycleEvent" />
+      <item index="1" class="java.lang.String" itemvalue="com.loror.mvvm.annotation.Config" />
+      <item index="2" class="java.lang.String" itemvalue="com.loror.mvvm.annotation.LiveDataEvent" />
     </list>
   </component>
   <component name="FrameworkDetectionExcludesConfiguration">

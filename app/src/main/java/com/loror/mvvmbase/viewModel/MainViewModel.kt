@@ -4,6 +4,7 @@ import androidx.databinding.ObservableField
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
+import com.loror.mvvm.annotation.Sign
 import com.loror.mvvm.core.MvvmViewModel
 import com.loror.mvvmbase.bean.Text2
 import com.loror.mvvmbase.model.MainModel
@@ -15,7 +16,8 @@ class MainViewModel : MvvmViewModel(), LifecycleObserver {
         const val EVENT_SHOW_BACK = 1
     }
 
-    private val model = MainModel(this)
+    @Sign
+    private lateinit var model: MainModel
 
     //Model
     val text1: ObservableField<String> = ObservableField()
