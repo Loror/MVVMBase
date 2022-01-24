@@ -2,13 +2,11 @@ package com.loror.mvvmbase.view
 
 import android.os.Bundle
 import android.widget.Toast
-import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
+import com.loror.mvvm.adapter.SimpleRecyclerAdapter
 import com.loror.mvvm.annotation.LiveDataEvent
 import com.loror.mvvm.annotation.Sign
 import com.loror.mvvm.core.MvvmViewModel
 import com.loror.mvvmbase.R
-import com.loror.mvvmbase.adapter.ListAdapter
 import com.loror.mvvmbase.databinding.ActivityMainBinding
 import com.loror.mvvmbase.util.BaseActivity
 import com.loror.mvvmbase.viewModel.MainViewModel
@@ -26,7 +24,24 @@ class MainActivity : BaseActivity() {
     }
 
     override fun initView(savedInstanceState: Bundle?) {
-        binding.adapter = ListAdapter(this)//绑定adapter
+        binding.adapter = object : SimpleRecyclerAdapter<String>(this, arrayListOf()) {
+
+            override fun onBindViewHolder(viewHolder: SimpleViewHolder, position: Int) {
+                viewHolder.setVariable(R.id.name, position.toString())
+                viewHolder.itemView.setOnClickListener {
+                    Toast.makeText(this@MainActivity, "item${position}点击", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+
+            override fun getLayout(viewType: Int): Int {
+                return R.layout.item_list_simple
+            }
+
+            override fun getItemCount(): Int {
+                return 10
+            }
+        }
         binding.net.setOnClickListener {
             viewModel.netBaidu()
         }

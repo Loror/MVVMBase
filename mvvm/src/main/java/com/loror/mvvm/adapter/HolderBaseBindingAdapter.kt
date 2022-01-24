@@ -1,4 +1,4 @@
-package com.loror.mvvmbase.util
+package com.loror.mvvm.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -9,34 +9,43 @@ import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 
-/**
- * Created by Loror on 2017/7/6.
- */
-abstract class HolderBaseAdapter(val context: Context) : BaseAdapter() {
-    val inflater: LayoutInflater
+abstract class HolderBaseBindingAdapter<T>(
+    val context: Context,
+    val data: List<T>?
+) :
+    BaseAdapter() {
+
+    private val inflater: LayoutInflater = LayoutInflater.from(context)
+
     override fun getItemId(position: Int): Long {
         return position.toLong()
     }
 
     @LayoutRes
-    abstract fun getLayout(position: Int): Int
-    abstract fun bindView(binding: ViewDataBinding, position: Int)
+    abstract fun getLayout(viewType: Int): Int
+
+    abstract fun onBindViewHolder(binding: ViewDataBinding, position: Int)
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view: View
         val binding: ViewDataBinding
         if (convertView == null) {
-            binding = DataBindingUtil.inflate(inflater, getLayout(position), parent, false)
+            binding = DataBindingUtil.inflate(inflater, getLayout(getItemViewType(position)), parent, false)
             view = binding.root
         } else {
             view = convertView
             binding = DataBindingUtil.getBinding(convertView)!!
         }
-        bindView(binding, position)
+        onBindViewHolder(binding, position)
         return view
     }
 
-    init {
-        inflater = LayoutInflater.from(context)
+    override fun getCount(): Int {
+        return data?.size ?: 0
     }
+
+    override fun getItem(position: Int): T? {
+        return data?.get(position)
+    }
+
 }

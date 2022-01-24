@@ -9,7 +9,7 @@
 
         <variable
             name="adapter"
-            type="android.widget.BaseAdapter" />
+            type="androidx.recyclerview.widget.RecyclerView.Adapter" />
     </data>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -66,7 +66,9 @@
             android:layout_height="wrap_content"
             android:text="回显" />
 
-        <ListView
+        <androidx.recyclerview.widget.RecyclerView
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:id="@+id/list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:adapter="@{adapter}" />
