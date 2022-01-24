@@ -11,16 +11,16 @@ import com.loror.mvvm.widget.OnSafeClickListener;
 
 import java.util.List;
 
-public abstract class HolderBaseRecycleAdapter<VH extends RecyclerView.ViewHolder, T> extends RecyclerView.Adapter<VH> {
+public abstract class HolderBaseRecyclerAdapter<VH extends RecyclerView.ViewHolder, T> extends RecyclerView.Adapter<VH> {
 
     private final List<T> data;
     protected AdapterView.OnItemClickListener onItemClickListener;
 
-    public HolderBaseRecycleAdapter(List<T> data) {
+    public HolderBaseRecyclerAdapter(List<T> data) {
         this.data = data;
     }
 
-    public HolderBaseRecycleAdapter<VH, T> setOnItemClickListener(AdapterView.OnItemClickListener onItemClickListener) {
+    public HolderBaseRecyclerAdapter<VH, T> setOnItemClickListener(AdapterView.OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
         return this;
     }
