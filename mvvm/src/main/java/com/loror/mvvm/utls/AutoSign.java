@@ -55,15 +55,16 @@ public class AutoSign {
                             Type genericType = field.getGenericType();
                             if (item == null) {
                                 field.set(obj, new ArrayList<>());
-                            }
-                            if (genericType instanceof ParameterizedType) {
-                                Type itemType = ((ParameterizedType) genericType).getActualTypeArguments()[0];
-                                if (canSign(itemType)) {
-                                    checkList((List) item, itemType);
-                                    continue;
+                            } else {
+                                if (genericType instanceof ParameterizedType) {
+                                    Type itemType = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+                                    if (canSign(itemType)) {
+                                        checkList((List) item, itemType);
+                                        continue;
+                                    }
                                 }
+                                sign(item);
                             }
-                            sign(item);
                         } else if (item != null) {
                             sign(item);
                         }
