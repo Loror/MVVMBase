@@ -323,7 +323,6 @@ public class ConfigUtil {
     private static synchronized Object getConstConfined(Class<?> type, Object obj) {
         Object data = configs.get(type);
         if (data == null && !foundService.contains(type)) {
-            foundService.add(type);
             Service service = type.getAnnotation(Service.class);
             if (service != null) {
                 boolean intoPool = service.intoPool();
@@ -340,6 +339,7 @@ public class ConfigUtil {
                         data = apiClient.create(type);
                         if (intoPool) {
                             configs.put(type, data);
+                            foundService.add(type);
                         }
                         return data;
                     } else {
@@ -379,6 +379,7 @@ public class ConfigUtil {
                         }
                         if (intoPool) {
                             configs.put(type, data);
+                            foundService.add(type);
                             if (type != generate) {
                                 configs.put(generate, data);
                             } else if (type.getSuperclass() != null && type.getSuperclass().isInterface()) {
