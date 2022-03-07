@@ -102,7 +102,7 @@ public class ConfigUtil {
                     handler.invoke(application, data);
                 }
             } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+                handlerException(e);
             }
         }
     }
@@ -163,7 +163,7 @@ public class ConfigUtil {
                         method.setAccessible(true);
                         method.invoke(application);
                     } catch (IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
+                        ConfigUtil.handlerException(e);
                     }
                 } else if (paramsType.length == 0) {
                     try {
@@ -387,8 +387,7 @@ public class ConfigUtil {
                             }
                         }
                     } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
-                        handler(e);
+                        ConfigUtil.handlerException(e);
                     }
                 }
             }
