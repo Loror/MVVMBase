@@ -126,7 +126,7 @@ public class ConfigUtil {
                         handler.getValue().invoke(application, t);
                     }
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    ConfigUtil.handlerException(e);
+                    throw new RuntimeException(e);
                 }
                 break;
             }
