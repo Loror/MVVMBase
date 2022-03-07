@@ -23,8 +23,16 @@ public class PropertyUtil {
     /**
      * 日期、时间格式化标准
      */
-    private final static String FMT_DATE_TIME_STR = "yyyy-MM-dd HH:mm:ss";
-    private final static SimpleDateFormat FMT_DATE_TIME_O = new SimpleDateFormat(FMT_DATE_TIME_STR, Locale.CHINA);
+    private static String FMT_DATE_TIME_STR = "yyyy-MM-dd HH:mm:ss";
+    private static SimpleDateFormat FMT_DATE_TIME_O = new SimpleDateFormat(FMT_DATE_TIME_STR, Locale.CHINA);
+
+    /**
+     * 设置日期、时间格式化标准
+     */
+    public static void setDateTime(String format) {
+        FMT_DATE_TIME_STR = format;
+        FMT_DATE_TIME_O = new SimpleDateFormat(FMT_DATE_TIME_STR, Locale.CHINA);
+    }
 
     /**
      * 当前筛选

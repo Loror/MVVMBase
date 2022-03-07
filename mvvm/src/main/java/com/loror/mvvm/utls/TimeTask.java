@@ -35,20 +35,32 @@ public class TimeTask {
         this.callback = callback;
     }
 
+    /**
+     * 启动
+     */
     public void start() {
         offset = SystemClock.uptimeMillis();
         handler.removeCallbacks(runnable);
         handler.post(runnable);
     }
 
+    /**
+     * 暂停
+     */
     public void pause() {
         handler.removeCallbacks(runnable);
     }
 
+    /**
+     * 停止
+     */
     public void stop() {
         stop(false);
     }
 
+    /**
+     * 停止
+     */
     public void stop(boolean resume) {
         pause();
         time = total;
