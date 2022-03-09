@@ -4,10 +4,13 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.text.Html
+import android.text.Spanned
 import android.util.TypedValue
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.loror.mvvm.widget.OnSafeClickListener
+import java.math.BigDecimal
 
 fun Context.getCompatColor(res: Int): Int {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -69,6 +72,36 @@ fun Long.fillZero(): String {
     return "$this"
 }
 
+/**
+ * 字符串转Decimal
+ * */
+fun String.asBigDecimal(): BigDecimal {
+    try {
+        return BigDecimal(this)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return BigDecimal(0)
+}
+
+/**
+ * 字符串转html
+ * */
+fun String.html(imageGetter: Html.ImageGetter? = null): Spanned {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        Html.fromHtml(
+            this,
+            Html.FROM_HTML_MODE_LEGACY,
+            imageGetter
+        ) { _, _, _, _ -> }
+    } else {
+        Html.fromHtml(
+            this,
+            imageGetter
+        ) { _, _, _, _ -> }
+    }
+}
+
 fun View.visible() {
     this.visibility = View.VISIBLE
 }
@@ -92,6 +125,12 @@ val Int.dp
  * */
 val Float.dp
     get() = getTypedValue(TypedValue.COMPLEX_UNIT_DIP, this)
+
+/**
+ * 获取sp值
+ * */
+val Int.sp
+    get() = this.toFloat().sp.toInt()
 
 /**
  * 获取sp值

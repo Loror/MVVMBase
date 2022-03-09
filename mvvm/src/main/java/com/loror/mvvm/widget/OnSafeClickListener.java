@@ -9,7 +9,7 @@ import com.loror.mvvm.utls.ConfigUtil;
 
 public class OnSafeClickListener implements View.OnClickListener {
 
-    final int CLICK_SPACE;
+    private final int clickSpace;
 
     private long click;
     private final View.OnClickListener l;
@@ -19,7 +19,7 @@ public class OnSafeClickListener implements View.OnClickListener {
     }
 
     public OnSafeClickListener(int space, View.OnClickListener l) {
-        this.CLICK_SPACE = space;
+        this.clickSpace = space;
         this.l = l;
     }
 
@@ -27,7 +27,7 @@ public class OnSafeClickListener implements View.OnClickListener {
     public void onClick(View v) {
         if (l != null) {
             long now = SystemClock.uptimeMillis();
-            if (now - click > CLICK_SPACE) {
+            if (now - click > clickSpace) {
                 click = now;
                 try {
                     l.onClick(v);

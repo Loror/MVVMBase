@@ -6,7 +6,7 @@
 
 ```
 dependencies {
-    implementation 'com.github.Loror:MVVMBase:1.3.4'
+    implementation 'com.github.Loror:MVVMBase:1.3.5'
 }
 
 allprojects {
