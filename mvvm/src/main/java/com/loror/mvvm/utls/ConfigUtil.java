@@ -3,6 +3,7 @@ package com.loror.mvvm.utls;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Handler;
+import android.util.Log;
 
 import androidx.fragment.app.Fragment;
 
@@ -12,6 +13,7 @@ import com.loror.lororUtil.http.api.OnRequestListener;
 import com.loror.mvvm.annotation.Config;
 import com.loror.mvvm.annotation.Service;
 import com.loror.mvvm.bean.ApiInfo;
+import com.loror.mvvm.bean.FeaturesInfo;
 import com.loror.mvvm.bean.SignInfo;
 import com.loror.mvvm.core.ConfigApplication;
 import com.loror.mvvm.core.MvvmActivity;
@@ -59,6 +61,7 @@ public class ConfigUtil {
     private static final Map<Class<?>, Object> configs = new HashMap<>();
     private static final Map<Class<?>, List<Method>> globalAppConfigs = new HashMap<>();
     private static final Map<Class<?>, List<Method>> globalStaticConfigs = new HashMap<>();
+    private static final List<Method> featuresConfigs = new ArrayList<>();
 
     /**
      * 局部配置
@@ -156,7 +159,9 @@ public class ConfigUtil {
             if (config != null) {
                 Class<?>[] paramsType = method.getParameterTypes();
                 Class<?> returnType = method.getReturnType();
-                if (paramsType.length == 1 && returnType == Void.TYPE) {
+                if (returnType == FeaturesInfo.class) {
+                    featuresConfigs.add(method);
+                } else if (paramsType.length == 1 && returnType == Void.TYPE) {
                     handlerConfigs.put(method.getParameterTypes()[0], method);
                 } else if (returnType == Void.TYPE) {
                     try {
@@ -185,6 +190,8 @@ public class ConfigUtil {
                         globalAppConfigs.put(method.getReturnType(), find);
                     }
                     find.add(method);
+                } else {
+                    Log.e("CONFIG", method.getDeclaringClass() + "." + method.getName() + "配置的config不符合格式要求");
                 }
             }
         }
@@ -215,12 +222,17 @@ public class ConfigUtil {
                         ConfigUtil.handlerException(e);
                     }
                 } else {
-                    List<Method> methodList = localConfigs.get(activity.getClass());
-                    if (methodList == null) {
-                        methodList = new ArrayList<>();
-                        localConfigs.put(activity.getClass(), methodList);
+                    Class<?>[] paramTypes = method.getParameterTypes();
+                    if (paramTypes.length == 0 || paramTypes[0] == SignInfo.class) {
+                        List<Method> methodList = localConfigs.get(activity.getClass());
+                        if (methodList == null) {
+                            methodList = new ArrayList<>();
+                            localConfigs.put(activity.getClass(), methodList);
+                        }
+                        methodList.add(method);
+                    } else {
+                        Log.e("CONFIG", method.getDeclaringClass() + "." + method.getName() + "只能是无参或只有SignInfo一个参数");
                     }
-                    methodList.add(method);
                 }
             }
         }
@@ -251,12 +263,17 @@ public class ConfigUtil {
                         ConfigUtil.handlerException(e);
                     }
                 } else {
-                    List<Method> methodList = localConfigs.get(fragment.getClass());
-                    if (methodList == null) {
-                        methodList = new ArrayList<>();
-                        localConfigs.put(fragment.getClass(), methodList);
+                    Class<?>[] paramTypes = method.getParameterTypes();
+                    if (paramTypes.length == 0 || paramTypes[0] == SignInfo.class) {
+                        List<Method> methodList = localConfigs.get(fragment.getClass());
+                        if (methodList == null) {
+                            methodList = new ArrayList<>();
+                            localConfigs.put(fragment.getClass(), methodList);
+                        }
+                        methodList.add(method);
+                    } else {
+                        Log.e("CONFIG", method.getDeclaringClass() + "." + method.getName() + "只能是无参或只有SignInfo一个参数");
                     }
-                    methodList.add(method);
                 }
             }
         }
@@ -277,7 +294,9 @@ public class ConfigUtil {
                     if (config != null) {
                         Class<?>[] paramsType = method.getParameterTypes();
                         Class<?> returnType = method.getReturnType();
-                        if (paramsType.length == 1 && returnType == Void.TYPE) {
+                        if (returnType == FeaturesInfo.class) {
+                            featuresConfigs.add(method);
+                        } else if (paramsType.length == 1 && returnType == Void.TYPE) {
                             handlerConfigs.put(method.getParameterTypes()[0], method);
                         } else if (returnType == Void.TYPE) {
                             try {
@@ -308,6 +327,8 @@ public class ConfigUtil {
                                 globalStaticConfigs.put(method.getReturnType(), find);
                             }
                             find.add(method);
+                        } else {
+                            Log.e("CONFIG", method.getDeclaringClass() + "." + method.getName() + "配置的config不符合格式要求");
                         }
                     }
                 }
@@ -462,6 +483,41 @@ public class ConfigUtil {
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         ConfigUtil.handlerException(e);
                     }
+                }
+            }
+        }
+        if (data == null && obj != null) {
+            for (Method method : featuresConfigs) {
+                boolean isStatic = Modifier.isStatic(method.getModifiers());
+                Class<?>[] paramTypes = method.getParameterTypes();
+                Class<?> paramType = paramTypes.length > 0 ? paramTypes[0] : null;
+                try {
+                    if (paramType == null) {
+                        FeaturesInfo featuresInfo = (FeaturesInfo) method.invoke(isStatic ? method.getDeclaringClass() : application);
+                        if (featuresInfo != null && featuresInfo.canCreate(type)) {
+                            data = featuresInfo.create(type);
+                        }
+                        break;
+                    } else if (method.getParameterTypes().length == 1 && paramType == SignInfo.class) {
+                        FeaturesInfo featuresInfo = (FeaturesInfo) method.invoke(isStatic ? method.getDeclaringClass() : application, signInfo);
+                        if (featuresInfo != null && featuresInfo.canCreate(type)) {
+                            data = featuresInfo.create(type);
+                        }
+                        break;
+                    } else if (paramType.isAssignableFrom(obj.getClass())) {
+                        FeaturesInfo featuresInfo;
+                        if (method.getParameterTypes().length == 1) {
+                            featuresInfo = (FeaturesInfo) method.invoke(isStatic ? method.getDeclaringClass() : application, obj);
+                        } else {
+                            featuresInfo = (FeaturesInfo) method.invoke(isStatic ? method.getDeclaringClass() : application, obj, signInfo);
+                        }
+                        if (featuresInfo != null && featuresInfo.canCreate(type)) {
+                            data = featuresInfo.create(type);
+                        }
+                        break;
+                    }
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    ConfigUtil.handlerException(e);
                 }
             }
         }
