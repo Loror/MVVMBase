@@ -496,14 +496,14 @@ public class ConfigUtil {
                         FeaturesInfo featuresInfo = (FeaturesInfo) method.invoke(isStatic ? method.getDeclaringClass() : application);
                         if (featuresInfo != null && featuresInfo.canCreate(type)) {
                             data = featuresInfo.create(type);
+                            break;
                         }
-                        break;
                     } else if (method.getParameterTypes().length == 1 && paramType == SignInfo.class) {
                         FeaturesInfo featuresInfo = (FeaturesInfo) method.invoke(isStatic ? method.getDeclaringClass() : application, signInfo);
                         if (featuresInfo != null && featuresInfo.canCreate(type)) {
                             data = featuresInfo.create(type);
+                            break;
                         }
-                        break;
                     } else if (paramType.isAssignableFrom(obj.getClass())) {
                         FeaturesInfo featuresInfo;
                         if (method.getParameterTypes().length == 1) {
@@ -513,8 +513,8 @@ public class ConfigUtil {
                         }
                         if (featuresInfo != null && featuresInfo.canCreate(type)) {
                             data = featuresInfo.create(type);
+                            break;
                         }
-                        break;
                     }
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     ConfigUtil.handlerException(e);
