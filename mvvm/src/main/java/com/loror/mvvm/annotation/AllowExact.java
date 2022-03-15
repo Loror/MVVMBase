@@ -6,10 +6,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * LiveData事件分发
+ * 允许解包
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
-public @interface LiveDataEvent {
-    int value();//筛选code
+public @interface AllowExact {
+
+    /**
+     * 是否使用getter方法解包
+     */
+    boolean byGetter() default false;
 }

@@ -7,6 +7,7 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModel;
 
+import com.loror.mvvm.bean.MethodInfo;
 import com.loror.mvvm.utls.ConfigUtil;
 import com.loror.mvvm.utls.SignUtil;
 
@@ -90,7 +91,7 @@ public class MvvmViewModel extends ViewModel {
         }
         attached.add(view);
         Method[] methods = view.getClass().getDeclaredMethods();
-        Map<Integer, Method> events = new HashMap<>();
+        Map<Integer, MethodInfo> events = new HashMap<>();
         for (Method method : methods) {
             com.loror.mvvm.annotation.LiveDataEvent liveDataEvent = method.getAnnotation(com.loror.mvvm.annotation.LiveDataEvent.class);
             if (liveDataEvent != null) {
@@ -98,16 +99,16 @@ public class MvvmViewModel extends ViewModel {
                     throw new IllegalArgumentException("LiveDataEvent的方法" + method.getName()
                             + "只能有不超过一个参数");
                 }
-                Method old = events.get(liveDataEvent.value());
+                MethodInfo old = events.get(liveDataEvent.value());
                 if (old != null) {
                     throw new IllegalStateException("方法" + method.getName() + "与" + old.getName()
                             + "使用了相同的code:" + liveDataEvent.value());
                 }
-                events.put(liveDataEvent.value(), method);
+                events.put(liveDataEvent.value(), new MethodInfo(method));
             }
         }
         liveData.observe(view, liveDataEvent -> {
-            Method method = events.get(liveDataEvent.getCode());
+            MethodInfo method = events.get(liveDataEvent.getCode());
             if (eventIntercept(liveDataEvent, view)) {
                 return;
             }
@@ -152,9 +153,13 @@ public class MvvmViewModel extends ViewModel {
     /**
      * 执行事件
      */
-    private void invoke(Method method, Object view, Object data) {
+    private void invoke(MethodInfo methodInfo, Object view, Object data) {
+        Method method = methodInfo.getMethod();
         Class<?>[] types = method.getParameterTypes();
         if (types.length == 1) {
+            if (methodInfo.isAllowExact()) {
+                data = methodInfo.exact(data, types[0]);
+            }
             try {
                 method.invoke(view, data);
             } catch (IllegalAccessException | InvocationTargetException e) {

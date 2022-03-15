@@ -6,10 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * LiveData事件分发
+ * 解包元素
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
-public @interface LiveDataEvent {
-    int value();//筛选code
+@Target({ElementType.METHOD, ElementType.FIELD})
+public @interface ExactOf {
+
 }
