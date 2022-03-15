@@ -53,6 +53,15 @@ public class MethodInfo {
      */
     public Object exact(Object data, Class<?> type) {
         if (allowExact && data != null) {
+
+            if (ReflectionUtil.isPrimitive(data.getClass())) {
+                return ReflectionUtil.convertValue(data, type, null);
+            }
+
+            if (data.getClass() == String.class) {
+                return ReflectionUtil.convertValue(data, type, null);
+            }
+
             boolean needCheckExact = true;
             if (exactBy != null) {
                 if (exactBy.getClass() == Method.class) {

@@ -5,6 +5,7 @@ import com.loror.lororUtil.text.TextUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -259,5 +260,15 @@ public class ReflectionUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * 是否为可拆箱类型
+     */
+    public static boolean isPrimitive(Type type) {
+        return type == Byte.class || type == Byte.TYPE || type == Short.class || type == Short.TYPE
+                || type == Integer.class || type == Integer.TYPE || type == Long.class || type == Long.TYPE
+                || type == Float.class || type == Float.TYPE || type == Double.class || type == Double.TYPE
+                || type == Boolean.class || type == Boolean.TYPE || type == Character.class || type == Character.TYPE;
     }
 }
