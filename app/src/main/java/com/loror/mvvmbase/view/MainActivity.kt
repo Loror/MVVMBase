@@ -3,6 +3,7 @@ package com.loror.mvvmbase.view
 import android.os.Bundle
 import android.widget.Toast
 import com.loror.mvvm.adapter.SimpleRecyclerAdapter
+import com.loror.mvvm.annotation.AllowExact
 import com.loror.mvvm.annotation.LiveDataEvent
 import com.loror.mvvm.annotation.Sign
 import com.loror.mvvm.core.MvvmViewModel
@@ -50,6 +51,7 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    @AllowExact
     @LiveDataEvent(MainViewModel.EVENT_SHOW_BACK)
     fun show(message: String) {
         binding.showBack.text = message

@@ -6,6 +6,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.loror.mvvm.annotation.Sign
 import com.loror.mvvm.core.MvvmViewModel
+import com.loror.mvvmbase.bean.DispatchTest
 import com.loror.mvvmbase.bean.Text2
 import com.loror.mvvmbase.model.MainModel
 import com.loror.mvvmbase.widget.toImage
@@ -40,7 +41,7 @@ class MainViewModel : MvvmViewModel(), LifecycleObserver {
     }
 
     fun showBack() {
-        dispatchLiveDataEvent(EVENT_SHOW_BACK, "回显次数：${times++}")
+        dispatchLiveDataEvent(EVENT_SHOW_BACK, DispatchTest("1", "回显次数：${times++}"))
     }
 
     fun baiduFailed(message: String) {
