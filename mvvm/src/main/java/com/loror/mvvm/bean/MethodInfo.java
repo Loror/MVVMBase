@@ -20,6 +20,7 @@ public class MethodInfo {
     private final String script;
 
     private Object exactBy;
+    private Class<?> exactByType = Void.class;
 
     public MethodInfo(Method method) {
         this.method = method;
@@ -76,7 +77,7 @@ public class MethodInfo {
             if (exactBy != null) {
                 if (exactBy.getClass() == Method.class) {
                     Method method = (Method) exactBy;
-                    if (type.isAssignableFrom(method.getReturnType()) || type == String.class) {
+                    if (type.isAssignableFrom(exactByType) || type == String.class) {
                         method.setAccessible(true);
                         try {
                             return tryScript(method.invoke(data), type);
@@ -86,7 +87,7 @@ public class MethodInfo {
                     }
                 } else if (exactBy.getClass() == Field.class) {
                     Field field = (Field) exactBy;
-                    if (type.isAssignableFrom(field.getType()) || type == String.class) {
+                    if (type.isAssignableFrom(exactByType) || type == String.class) {
                         field.setAccessible(true);
                         try {
                             return tryScript(field.get(data), type);
@@ -103,10 +104,25 @@ public class MethodInfo {
                     Method[] methods = ReflectionUtil.findAllGetterMethod(data.getClass());
                     if (needCheckExact) {
                         for (Method method : methods) {
-                            if (method.getAnnotation(ExactOf.class) != null &&
-                                    (type.isAssignableFrom(method.getReturnType()) || type == String.class)) {
-                                exactBy = method;
-                                return tryScript(exact(data, type), type);
+                            if (method.getAnnotation(ExactOf.class) != null) {
+                                //可能是泛型
+                                if (method.getReturnType() == Object.class) {
+                                    method.setAccessible(true);
+                                    try {
+                                        Object val = method.invoke(data);
+                                        if (val != null && type.isAssignableFrom(val.getClass())) {
+                                            exactByType = val.getClass();
+                                            exactBy = method;
+                                            return tryScript(val, type);
+                                        }
+                                    } catch (IllegalAccessException | InvocationTargetException e) {
+                                        e.printStackTrace();
+                                    }
+                                } else if (type.isAssignableFrom(method.getReturnType()) || type == String.class) {
+                                    exactByType = method.getReturnType();
+                                    exactBy = method;
+                                    return exact(data, type);
+                                }
                             }
                         }
                         exactBy = Void.class;
@@ -125,10 +141,25 @@ public class MethodInfo {
                     Field[] fields = data.getClass().getDeclaredFields();
                     if (needCheckExact) {
                         for (Field field : fields) {
-                            if (field.getAnnotation(ExactOf.class) != null &&
-                                    (type.isAssignableFrom(field.getType()) || type == String.class)) {
-                                exactBy = field;
-                                return exact(data, type);
+                            if (field.getAnnotation(ExactOf.class) != null) {
+                                //可能是泛型
+                                if (field.getType() == Object.class) {
+                                    field.setAccessible(true);
+                                    try {
+                                        Object val = field.get(data);
+                                        if (val != null && type.isAssignableFrom(val.getClass())) {
+                                            exactByType = val.getClass();
+                                            exactBy = field;
+                                            return tryScript(val, type);
+                                        }
+                                    } catch (IllegalAccessException e) {
+                                        e.printStackTrace();
+                                    }
+                                } else if (type.isAssignableFrom(field.getType()) || type == String.class) {
+                                    exactByType = field.getType();
+                                    exactBy = field;
+                                    return exact(data, type);
+                                }
                             }
                         }
                         exactBy = Void.class;

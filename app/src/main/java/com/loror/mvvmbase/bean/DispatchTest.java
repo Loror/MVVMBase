@@ -2,13 +2,13 @@ package com.loror.mvvmbase.bean;
 
 import com.loror.mvvm.annotation.ExactOf;
 
-public class DispatchTest {
+public class DispatchTest<T> {
 
     private String code;
     @ExactOf
-    private String message;
+    private T message;
 
-    public DispatchTest(String code, String message) {
+    public DispatchTest(String code, T message) {
         this.code = code;
         this.message = message;
     }
@@ -21,11 +21,11 @@ public class DispatchTest {
         this.code = code;
     }
 
-    public String getMessage() {
+    public T getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(T message) {
         this.message = message;
     }
 }
