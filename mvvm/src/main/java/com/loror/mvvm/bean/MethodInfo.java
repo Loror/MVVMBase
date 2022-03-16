@@ -110,7 +110,7 @@ public class MethodInfo {
                                     method.setAccessible(true);
                                     try {
                                         Object val = method.invoke(data);
-                                        if (val != null && type.isAssignableFrom(val.getClass())) {
+                                        if (val != null && (type.isAssignableFrom(val.getClass()) || type == String.class)) {
                                             exactByType = val.getClass();
                                             exactBy = method;
                                             return tryScript(val, type);
@@ -147,7 +147,7 @@ public class MethodInfo {
                                     field.setAccessible(true);
                                     try {
                                         Object val = field.get(data);
-                                        if (val != null && type.isAssignableFrom(val.getClass())) {
+                                        if (val != null && (type.isAssignableFrom(val.getClass()) || type == String.class)) {
                                             exactByType = val.getClass();
                                             exactBy = field;
                                             return tryScript(val, type);
