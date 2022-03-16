@@ -66,19 +66,23 @@ public class MethodInfo {
             if (exactBy != null) {
                 if (exactBy.getClass() == Method.class) {
                     Method method = (Method) exactBy;
-                    method.setAccessible(true);
-                    try {
-                        return method.invoke(data);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        ConfigUtil.handlerException(e);
+                    if (type.isAssignableFrom(method.getReturnType())) {
+                        method.setAccessible(true);
+                        try {
+                            return method.invoke(data);
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                            ConfigUtil.handlerException(e);
+                        }
                     }
                 } else if (exactBy.getClass() == Field.class) {
                     Field field = (Field) exactBy;
-                    field.setAccessible(true);
-                    try {
-                        return field.get(data);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+                    if (type.isAssignableFrom(field.getType())) {
+                        field.setAccessible(true);
+                        try {
+                            return field.get(data);
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
                     }
                 } else {
                     needCheckExact = false;
@@ -89,7 +93,7 @@ public class MethodInfo {
                     Method[] methods = ReflectionUtil.findAllGetterMethod(data.getClass());
                     if (needCheckExact) {
                         for (Method method : methods) {
-                            if (method.getAnnotation(ExactOf.class) != null) {
+                            if (method.getAnnotation(ExactOf.class) != null && type.isAssignableFrom(method.getReturnType())) {
                                 exactBy = method;
                                 return exact(data, type);
                             }
@@ -110,7 +114,7 @@ public class MethodInfo {
                     Field[] fields = data.getClass().getDeclaredFields();
                     if (needCheckExact) {
                         for (Field field : fields) {
-                            if (field.getAnnotation(ExactOf.class) != null) {
+                            if (field.getAnnotation(ExactOf.class) != null && type.isAssignableFrom(field.getType())) {
                                 exactBy = field;
                                 return exact(data, type);
                             }
