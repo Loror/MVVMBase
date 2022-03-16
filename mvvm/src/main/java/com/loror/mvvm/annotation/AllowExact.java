@@ -16,4 +16,9 @@ public @interface AllowExact {
      * 是否使用getter方法解包
      */
     boolean byGetter() default false;
+
+    /**
+     * 脚本
+     * */
+    String script() default "";
 }

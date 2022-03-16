@@ -51,7 +51,7 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    @AllowExact
+    @AllowExact(script = "insert:`回显次数：`,0")
     @LiveDataEvent(MainViewModel.EVENT_SHOW_BACK)
     fun show(message: String) {
         binding.showBack.text = message

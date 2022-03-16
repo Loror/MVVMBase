@@ -41,7 +41,7 @@ class MainViewModel : MvvmViewModel(), LifecycleObserver {
     }
 
     fun showBack() {
-        dispatchLiveDataEvent(EVENT_SHOW_BACK, DispatchTest("1", "回显次数：${times++}"))
+        dispatchLiveDataEvent(EVENT_SHOW_BACK, DispatchTest("1", "${times++}"))
     }
 
     fun baiduFailed(message: String) {
