@@ -9,8 +9,8 @@ public class Message {
         return this.code;
     }
 
-    public void setCode(int var1) {
-        this.code = var1;
+    public void setCode(int code) {
+        this.code = code;
     }
 
     public String getMessage() {
