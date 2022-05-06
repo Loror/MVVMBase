@@ -146,5 +146,30 @@ public class SharedPreferenceUtil {
             editor.remove(key).apply();
         }
     }
+
+    /**
+     * 移除所有数据
+     */
+    public static void clear() {
+        clear(false);
+    }
+
+    /**
+     * 移除所有数据
+     *
+     * @param sync 是否同步执行
+     */
+    @SuppressLint("ApplySharedPref")
+    public static void clear(boolean sync) {
+        if (sharedPreferences == null) {
+            return;
+        }
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if (sync) {
+            editor.clear().commit();
+        } else {
+            editor.clear().apply();
+        }
+    }
 }
 
