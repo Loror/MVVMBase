@@ -2,11 +2,11 @@
 
 [![License](https://img.shields.io/badge/License%20-Apache%202-337ab7.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-## Studio中引入项目
+## Studio中引入项目 
 
 ```
 dependencies {
-    implementation 'com.github.Loror:MVVMBase:1.3.7'
+    implementation 'com.github.Loror:MVVMBase:1.3.8'
 }
 
 allprojects {
