@@ -152,7 +152,7 @@ public class ConfigUtil {
             if (Modifier.isStatic(method.getModifiers())) {
                 continue;
             }
-            if (method.getParameterTypes().length > 1) {
+            if (method.getParameterTypes().length > 2) {
                 continue;
             }
             Config config = method.getAnnotation(Config.class);
