@@ -103,6 +103,13 @@ public class MvvmActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 注销loading弹窗
+     */
+    protected void disposeProgress() {
+        progressViewDialog = null;
+    }
+
     /*
      * 动态申请权限
      */

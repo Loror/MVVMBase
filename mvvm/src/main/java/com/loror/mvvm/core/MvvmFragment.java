@@ -58,6 +58,13 @@ public class MvvmFragment extends Fragment {
         }
     }
 
+    /**
+     * 注销loading弹窗
+     */
+    protected void disposeProgress() {
+        progressViewDialog = null;
+    }
+
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
