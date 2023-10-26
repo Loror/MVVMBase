@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -70,7 +71,7 @@ public class MvvmDialog extends Dialog {
         Window dialogWindow = getWindow();
         dialogWindow.setGravity(Gravity.BOTTOM);
         WindowManager.LayoutParams lp = dialogWindow.getAttributes();
-        lp.width = getScreenWidth();
+        lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
         if (height > 0) {
             lp.height = height;
         }
