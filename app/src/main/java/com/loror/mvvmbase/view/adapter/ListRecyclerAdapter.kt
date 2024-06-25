@@ -1,4 +1,4 @@
-package com.loror.mvvmbase.adapter
+package com.loror.mvvmbase.view.adapter
 
 import android.content.Context
 import androidx.databinding.ViewDataBinding

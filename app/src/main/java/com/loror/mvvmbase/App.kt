@@ -5,7 +5,7 @@ import com.loror.lororUtil.http.api.TypeInfo
 import com.loror.mvvm.core.ConfigApplication
 import com.loror.mvvm.utls.AutoSign
 import com.loror.mvvm.utls.ConfigUtil
-import com.loror.mvvmbase.net.ApiConfig
+import com.loror.mvvmbase.common.net.ApiConfig
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject

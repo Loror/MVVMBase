@@ -1,4 +1,4 @@
-package com.loror.mvvmbase.bean;
+package com.loror.mvvmbase.common.bean;
 
 import com.loror.mvvm.annotation.ExactOf;
 

@@ -1,4 +1,4 @@
-package com.loror.mvvmbase.net;
+package com.loror.mvvmbase.common.net;
 
 import com.loror.lororUtil.annotation.BaseUrl;
 import com.loror.lororUtil.annotation.GET;

@@ -1,4 +1,4 @@
-package com.loror.mvvmbase.util
+package com.loror.mvvmbase.common.base
 
 import android.app.Activity
 import android.content.Context

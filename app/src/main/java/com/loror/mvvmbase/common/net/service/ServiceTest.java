@@ -1,4 +1,4 @@
-package com.loror.mvvmbase.service;
+package com.loror.mvvmbase.common.net.service;
 
 import com.loror.lororUtil.http.Responce;
 import com.loror.lororUtil.http.api.Observable;

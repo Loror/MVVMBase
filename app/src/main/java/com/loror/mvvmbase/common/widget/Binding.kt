@@ -1,4 +1,4 @@
-package com.loror.mvvmbase.widget
+package com.loror.mvvmbase.common.widget
 
 import android.widget.ImageView
 import androidx.annotation.DrawableRes

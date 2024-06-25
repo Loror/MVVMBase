@@ -1,4 +1,4 @@
-package com.loror.mvvmbase.net
+package com.loror.mvvmbase.common.net
 
 import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.JSONArray
