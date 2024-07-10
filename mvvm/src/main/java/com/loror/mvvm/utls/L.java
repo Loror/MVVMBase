@@ -5,6 +5,7 @@ import android.util.Log;
 /**
  * Log统一管理类
  */
+@Deprecated
 public class L {
     private L() {
         throw new UnsupportedOperationException("cannot be instantiated");
