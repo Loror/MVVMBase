@@ -29,8 +29,6 @@ public class MvvmDialog extends Dialog {
         this.context = context;
         ConfigUtil.config(getClass());
         if (!(this instanceof LayoutDialog)) {
-            SignUtil.signConfig(this);
-        } else if (MvvmSign.SIGN_VIEW) {
             SignUtil.sign(this);
         }
     }

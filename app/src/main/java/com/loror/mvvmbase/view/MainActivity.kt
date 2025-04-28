@@ -10,6 +10,7 @@ import com.loror.mvvm.core.MvvmViewModel
 import com.loror.mvvmbase.R
 import com.loror.mvvmbase.common.base.BaseActivity
 import com.loror.mvvmbase.databinding.ActivityMainBinding
+import com.loror.mvvmbase.databinding.ActivityMainTestBinding
 import com.loror.mvvmbase.model.MainModel
 import com.loror.mvvmbase.viewModel.MainViewModel
 
@@ -17,6 +18,9 @@ class MainActivity : BaseActivity() {
 
     @Sign
     private lateinit var binding: ActivityMainBinding
+
+    @Sign
+    private lateinit var bindingTest: ActivityMainTestBinding
 
     @Sign
     private lateinit var model: MainModel
@@ -32,6 +36,7 @@ class MainActivity : BaseActivity() {
         binding.model = model
         model.text1.set("123")
         model.text2.setText2("456")
+        bindingTest.text.text = "test"
         binding.list.adapter = Adapter(this)
         binding.net.setOnClickListener {
             viewModel.netBaidu()

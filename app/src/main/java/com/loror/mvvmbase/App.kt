@@ -5,6 +5,7 @@ import com.loror.lororUtil.http.api.TypeInfo
 import com.loror.mvvm.core.ConfigApplication
 import com.loror.mvvm.utls.AutoSign
 import com.loror.mvvm.utls.ConfigUtil
+import com.loror.mvvm.utls.SignUtil
 import com.loror.mvvmbase.common.net.ApiConfig
 import org.json.JSONArray
 import org.json.JSONException
@@ -14,6 +15,7 @@ class App : ConfigApplication() {
 
     override fun onCreate() {
         super.onCreate()
+        SignUtil.MIX_MODE = true
         ConfigUtil.config(ApiConfig::class.java)
     }
 

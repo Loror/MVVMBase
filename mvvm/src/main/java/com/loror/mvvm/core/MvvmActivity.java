@@ -43,8 +43,6 @@ public class MvvmActivity extends AppCompatActivity {
         ConfigUtil.config(this);
         this.context = this;
         if (!(this instanceof LayoutActivity)) {
-            SignUtil.signConfig(this);
-        } else if (MvvmSign.SIGN_VIEW) {
             SignUtil.sign(this);
         }
     }

@@ -33,8 +33,6 @@ import java.util.Map;
 
 public class MvvmSign {
 
-    public static boolean SIGN_VIEW = false;//是否为view（activity、fragment、dialog）执行sign
-
     /****************************读取sign配置**************************/
 
     /**

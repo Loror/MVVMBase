@@ -24,6 +24,8 @@ import java.lang.reflect.Modifier;
  */
 public class SignUtil {
 
+    public static boolean MIX_MODE = false;//viewBinding、dataBinding混用模式
+
     private static boolean viewBindingSupport;
 
     static {
@@ -88,6 +90,9 @@ public class SignUtil {
             if (binding != null) {
                 signDataBinding(obj, field, null, binding);
             }
+            if (MIX_MODE && viewBindingSupport) {
+                signViewBinding(obj, field, null);
+            }
         }
         Method[] methods = obj.getClass().getMethods();
         for (Method method : methods) {
@@ -101,6 +106,9 @@ public class SignUtil {
             signViewModel(obj, null, method);
             if (binding != null) {
                 signDataBinding(obj, null, method, binding);
+            }
+            if (MIX_MODE && viewBindingSupport) {
+                signViewBinding(obj, null, method);
             }
         }
     }

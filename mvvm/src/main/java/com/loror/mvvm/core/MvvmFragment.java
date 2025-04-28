@@ -23,8 +23,6 @@ public class MvvmFragment extends Fragment {
         super.onCreate(savedInstanceState);
         ConfigUtil.config(this);
         if (!(this instanceof LayoutFragment)) {
-            SignUtil.signConfig(this);
-        } else if (MvvmSign.SIGN_VIEW) {
             SignUtil.sign(this);
         }
     }
