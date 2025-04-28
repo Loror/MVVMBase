@@ -27,12 +27,16 @@ public abstract class ConfigApplication extends Application implements JsonParse
     /**
      * 获取id的class
      */
-    protected abstract Class<?> getIdClass();
+    protected Class<?> getIdClass() {
+        return null;
+    }
 
     /**
      * 获取半屏像素
      */
-    protected abstract int getHalfPixel();
+    protected int getHalfPixel() {
+        return 0;
+    }
 
     /**
      * 配置LororUtil

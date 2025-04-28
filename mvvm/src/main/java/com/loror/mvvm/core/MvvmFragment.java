@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.loror.mvvm.R;
+import com.loror.mvvm.dataBinding.LayoutFragment;
 import com.loror.mvvm.dialog.ProgressDialog;
 import com.loror.mvvm.dialog.ProgressViewDialog;
 import com.loror.mvvm.utls.ConfigUtil;
@@ -21,8 +22,10 @@ public class MvvmFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ConfigUtil.config(this);
-        if (!(this instanceof MvvmSignFragment)) {
+        if (!(this instanceof LayoutFragment)) {
             SignUtil.signConfig(this);
+        } else if (MvvmSign.SIGN_VIEW) {
+            SignUtil.sign(this);
         }
     }
 

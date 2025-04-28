@@ -12,6 +12,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 
+import com.loror.mvvm.dataBinding.LayoutDialog;
 import com.loror.mvvm.utls.ConfigUtil;
 import com.loror.mvvm.utls.ScreenUtil;
 import com.loror.mvvm.utls.SignUtil;
@@ -27,8 +28,10 @@ public class MvvmDialog extends Dialog {
         super(context, themeResId);
         this.context = context;
         ConfigUtil.config(getClass());
-        if (!(this instanceof MvvmSignDialog)) {
+        if (!(this instanceof LayoutDialog)) {
             SignUtil.signConfig(this);
+        } else if (MvvmSign.SIGN_VIEW) {
+            SignUtil.sign(this);
         }
     }
 

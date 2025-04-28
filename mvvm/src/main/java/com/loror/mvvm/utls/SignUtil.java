@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.loror.mvvm.annotation.Sign;
-import com.loror.mvvm.bean.SignInfo;
+import com.loror.mvvm.core.MvvmSign;
 import com.loror.mvvm.core.MvvmViewModel;
 
 import java.lang.reflect.Field;
@@ -22,16 +22,33 @@ public class SignUtil {
      * 手动注册@Sign支持的类型
      */
     public static <S, T extends S> void registerSign(Class<S> type, T data, boolean allowCover) {
-        if (type == null || data == null) {
-            return;
-        }
-        if (!allowCover) {
-            Object old = ConfigUtil.getSingletonConfig(type);
-            if (old != null) {
-                throw new IllegalArgumentException("type " + type.getName() + " is already registered");
+        MvvmSign.registerSign(type, data, allowCover);
+    }
+
+    /**
+     * 为Sign注解字段赋值
+     */
+    public static void sign(Object obj) {
+        signConfig(obj);
+        Field[] fields = obj.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            Sign sign = field.getAnnotation(Sign.class);
+            if (sign == null) {
+                continue;
             }
+            signViewModel(obj, field, null);
         }
-        ConfigUtil.addSingletonConfig(type, data);
+        Method[] methods = obj.getClass().getMethods();
+        for (Method method : methods) {
+            if (!method.getName().startsWith("set") || method.getParameterTypes().length != 1) {
+                continue;
+            }
+            Sign sign = method.getAnnotation(Sign.class);
+            if (sign == null) {
+                continue;
+            }
+            signViewModel(obj, null, method);
+        }
     }
 
     /**
@@ -39,19 +56,38 @@ public class SignUtil {
      */
     public static void sign(Object obj, ViewDataBinding binding) {
         signConfig(obj);
-        signSpecial(obj, binding);
-    }
-
-    /**
-     * 为Sign注解字段赋值，特殊类型
-     */
-    private static void signSpecial(Object obj, ViewDataBinding binding) {
         Field[] fields = obj.getClass().getDeclaredFields();
         for (Field field : fields) {
             Sign sign = field.getAnnotation(Sign.class);
             if (sign == null) {
                 continue;
             }
+            signViewModel(obj, field, null);
+            if (binding != null) {
+                signDataBinding(obj, field, null, binding);
+            }
+        }
+        Method[] methods = obj.getClass().getMethods();
+        for (Method method : methods) {
+            if (!method.getName().startsWith("set") || method.getParameterTypes().length != 1) {
+                continue;
+            }
+            Sign sign = method.getAnnotation(Sign.class);
+            if (sign == null) {
+                continue;
+            }
+            signViewModel(obj, null, method);
+            if (binding != null) {
+                signDataBinding(obj, null, method, binding);
+            }
+        }
+    }
+
+    /**
+     * 为Sign注解字段赋值，特殊类型
+     */
+    private static void signViewModel(Object obj, Field field, Method method) {
+        if (field != null) {
             if (MvvmViewModel.class.isAssignableFrom(field.getType())) {
                 if (obj instanceof LifecycleOwner && obj instanceof ViewModelStoreOwner) {
                     field.setAccessible(true);
@@ -67,31 +103,8 @@ public class SignUtil {
                         ConfigUtil.handlerException(e);
                     }
                 }
-            } else if (ViewDataBinding.class.isAssignableFrom(field.getType())) {
-                if (binding == null) {
-                    continue;
-                }
-                field.setAccessible(true);
-                try {
-                    if (Modifier.isStatic(field.getModifiers())) {
-                        field.set(obj.getClass(), binding);
-                    } else {
-                        field.set(obj, binding);
-                    }
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
             }
-        }
-        Method[] methods = obj.getClass().getMethods();
-        for (Method method : methods) {
-            if (!method.getName().startsWith("set") || method.getParameterTypes().length != 1) {
-                continue;
-            }
-            Sign sign = method.getAnnotation(Sign.class);
-            if (sign == null) {
-                continue;
-            }
+        } else if (method != null) {
             Class<?> type = method.getParameterTypes()[0];
             if (MvvmViewModel.class.isAssignableFrom(type)) {
                 if (obj instanceof LifecycleOwner && obj instanceof ViewModelStoreOwner) {
@@ -108,9 +121,35 @@ public class SignUtil {
                         ConfigUtil.handlerException(e);
                     }
                 }
-            } else if (ViewDataBinding.class.isAssignableFrom(type)) {
+            }
+        }
+    }
+
+    /**
+     * 为Sign注解字段赋值，特殊类型
+     */
+    private static void signDataBinding(Object obj, Field field, Method method, ViewDataBinding binding) {
+        if (field != null) {
+            if (ViewDataBinding.class.isAssignableFrom(field.getType())) {
                 if (binding == null) {
-                    continue;
+                    return;
+                }
+                field.setAccessible(true);
+                try {
+                    if (Modifier.isStatic(field.getModifiers())) {
+                        field.set(obj.getClass(), binding);
+                    } else {
+                        field.set(obj, binding);
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else if (method != null) {
+            Class<?> type = method.getParameterTypes()[0];
+            if (ViewDataBinding.class.isAssignableFrom(type)) {
+                if (binding == null) {
+                    return;
                 }
                 method.setAccessible(true);
                 try {
@@ -130,50 +169,6 @@ public class SignUtil {
      * 为Sign注解字段赋值
      */
     public static void signConfig(Object obj) {
-        boolean isStatic = obj instanceof Class;
-        Field[] fields = (isStatic ? ((Class<?>) obj) : obj.getClass()).getDeclaredFields();
-        for (Field field : fields) {
-            if (isStatic && !Modifier.isStatic(field.getModifiers())) {
-                continue;
-            }
-            Sign sign = field.getAnnotation(Sign.class);
-            if (sign == null) {
-                continue;
-            }
-            field.setAccessible(true);
-            try {
-                if (field.get(obj) == null) {
-                    Object conf = ConfigUtil.getConfined(field.getType(), obj, new SignInfo(obj, field));
-                    if (conf != null) {
-                        field.set(obj, conf);
-                    }
-                }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        Method[] methods = (isStatic ? ((Class<?>) obj) : obj.getClass()).getMethods();
-        for (Method method : methods) {
-            if (isStatic && !Modifier.isStatic(method.getModifiers())) {
-                continue;
-            }
-            if (!method.getName().startsWith("set") || method.getParameterTypes().length != 1) {
-                continue;
-            }
-            Sign sign = method.getAnnotation(Sign.class);
-            if (sign == null) {
-                continue;
-            }
-            Class<?> type = method.getParameterTypes()[0];
-            Object conf = ConfigUtil.getConfined(type, obj, new SignInfo(obj, method));
-            if (conf != null) {
-                method.setAccessible(true);
-                try {
-                    method.invoke(obj, conf);
-                } catch (Exception e) {
-                    ConfigUtil.handlerException(e);
-                }
-            }
-        }
+        MvvmSign.signConfig(obj);
     }
 }

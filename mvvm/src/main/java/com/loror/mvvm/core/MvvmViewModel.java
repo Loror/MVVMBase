@@ -11,6 +11,7 @@ import com.loror.mvvm.bean.MethodInfo;
 import com.loror.mvvm.utls.ConfigUtil;
 import com.loror.mvvm.utls.SignUtil;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -62,15 +63,35 @@ public class MvvmViewModel extends ViewModel {
     }
 
     protected final MutableLiveData<LiveDataEvent> liveData = new MutableLiveData<>();
-    protected final List<LifecycleOwner> attached = new ArrayList<>();
+    protected final List<WeakReference<LifecycleOwner>> attached = new ArrayList<>();
+    private boolean releaseWhenCleared = true;
 
     @Override
     protected void onCleared() {
-        for (LifecycleOwner view : attached) {
-            liveData.removeObservers(view);
+        if (releaseWhenCleared) {
+            release();
+        }
+        super.onCleared();
+    }
+
+    /**
+     * onCleared时解除liveData绑定
+     */
+    public void setReleaseWhenCleared(boolean releaseWhenCleared) {
+        this.releaseWhenCleared = releaseWhenCleared;
+    }
+
+    /**
+     * 清空监听
+     */
+    public void release() {
+        for (WeakReference<LifecycleOwner> item : attached) {
+            LifecycleOwner view = item.get();
+            if (view != null) {
+                liveData.removeObservers(view);
+            }
         }
         attached.clear();
-        super.onCleared();
     }
 
     /**
@@ -86,10 +107,12 @@ public class MvvmViewModel extends ViewModel {
      * 绑定View，自动分发事件
      */
     public void attachView(LifecycleOwner view) {
-        if (attached.contains(view)) {
-            return;
+        for (WeakReference<LifecycleOwner> item : attached) {
+            if (item.get() == view) {
+                return;
+            }
         }
-        attached.add(view);
+        attached.add(new WeakReference<>(view));
         Method[] methods = view.getClass().getDeclaredMethods();
         Map<Integer, MethodInfo> events = new HashMap<>();
         for (Method method : methods) {

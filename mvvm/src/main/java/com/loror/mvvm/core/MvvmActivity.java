@@ -18,6 +18,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.loror.mvvm.R;
+import com.loror.mvvm.dataBinding.LayoutActivity;
 import com.loror.mvvm.dialog.ProgressDialog;
 import com.loror.mvvm.dialog.ProgressViewDialog;
 import com.loror.mvvm.utls.ActivityUtil;
@@ -41,8 +42,10 @@ public class MvvmActivity extends AppCompatActivity {
         ActivityUtil.setCustomDensity(this);
         ConfigUtil.config(this);
         this.context = this;
-        if (!(this instanceof MvvmSignActivity)) {
+        if (!(this instanceof LayoutActivity)) {
             SignUtil.signConfig(this);
+        } else if (MvvmSign.SIGN_VIEW) {
+            SignUtil.sign(this);
         }
     }
 
