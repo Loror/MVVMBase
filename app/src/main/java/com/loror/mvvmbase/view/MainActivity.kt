@@ -41,6 +41,9 @@ class MainActivity : BaseActivity() {
         binding.net.setOnClickListener {
             viewModel.netBaidu()
         }
+        binding.cross.setOnClickListener {
+            viewModel.cross()
+        }
         binding.showBack.setOnClickListener {
             viewModel.showBack()
         }

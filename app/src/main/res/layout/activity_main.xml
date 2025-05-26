@@ -13,9 +13,15 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="#33000000"
+        android:orientation="vertical"
         tools:context=".view.MainActivity">
+
+        <fragment
+            android:id="@+id/frag"
+            android:name="com.loror.mvvmbase.view.MainFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="10dp" />
 
         <TextView
             android:layout_width="match_parent"
@@ -56,6 +62,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="网络访问" />
+
+        <Button
+            android:id="@+id/cross"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="通知fragment" />
 
         <Button
             android:id="@+id/showBack"

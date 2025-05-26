@@ -65,6 +65,7 @@ public class MvvmViewModel extends ViewModel {
     protected final MutableLiveData<LiveDataEvent> liveData = new MutableLiveData<>();
     protected final List<WeakReference<LifecycleOwner>> attached = new ArrayList<>();
     private boolean releaseWhenCleared = true;
+    private boolean multiMode;
 
     @Override
     protected void onCleared() {
@@ -79,6 +80,13 @@ public class MvvmViewModel extends ViewModel {
      */
     public void setReleaseWhenCleared(boolean releaseWhenCleared) {
         this.releaseWhenCleared = releaseWhenCleared;
+    }
+
+    /**
+     * 支持多owner attach模式
+     */
+    public void setMultiMode(boolean multiMode) {
+        this.multiMode = multiMode;
     }
 
     /**
@@ -103,16 +111,7 @@ public class MvvmViewModel extends ViewModel {
         }
     }
 
-    /**
-     * 绑定View，自动分发事件
-     */
-    public void attachView(LifecycleOwner view) {
-        for (WeakReference<LifecycleOwner> item : attached) {
-            if (item.get() == view) {
-                return;
-            }
-        }
-        attached.add(new WeakReference<>(view));
+    private Map<Integer, MethodInfo> getEvents(LifecycleOwner view) {
         Method[] methods = view.getClass().getDeclaredMethods();
         Map<Integer, MethodInfo> events = new HashMap<>();
         for (Method method : methods) {
@@ -130,47 +129,76 @@ public class MvvmViewModel extends ViewModel {
                 events.put(liveDataEvent.value(), new MethodInfo(method));
             }
         }
+        return events;
+    }
+
+    /**
+     * 绑定View，自动分发事件
+     */
+    public void attachView(LifecycleOwner view) {
+        for (WeakReference<LifecycleOwner> item : attached) {
+            if (item.get() == view) {
+                return;
+            }
+        }
+        attached.add(new WeakReference<>(view));
+        Map<Integer, MethodInfo> events = getEvents(view);
         liveData.observe(view, liveDataEvent -> {
-            MethodInfo method = events.get(liveDataEvent.getCode());
-            if (eventIntercept(liveDataEvent, view)) {
-                return;
-            }
-            if (liveDataEvent.getCode() == EVENT_SUCCESS || liveDataEvent.getCode() == EVENT_FAILED) {
-                if (method == null) {
-                    return;
-                }
-            } else if (liveDataEvent.getCode() == EVENT_SHOW_PROGRESS) {
-                Object value = liveDataEvent.getData();
-                if (view instanceof MvvmActivity) {
-                    if (value == null) {
-                        ((MvvmActivity) view).showProgress();
-                    } else {
-                        ((MvvmActivity) view).showProgress(String.valueOf(value));
-                    }
-                } else if (view instanceof MvvmFragment) {
-                    if (value == null) {
-                        ((MvvmFragment) view).showProgress();
-                    } else {
-                        ((MvvmFragment) view).showProgress(String.valueOf(value));
+            if (multiMode) {
+                for (WeakReference<LifecycleOwner> lifecycleOwnerWeakReference : attached) {
+                    LifecycleOwner owner = lifecycleOwnerWeakReference.get();
+                    if (owner != null) {
+                        Map<Integer, MethodInfo> everyEvents = getEvents(owner);
+                        MethodInfo method = everyEvents.get(liveDataEvent.getCode());
+                        invokeEvent(method, liveDataEvent, owner);
                     }
                 }
-                return;
-            } else if (liveDataEvent.getCode() == EVENT_CLOSE_PROGRESS) {
-                if (view instanceof MvvmActivity) {
-                    ((MvvmActivity) view).dismissProgress();
-                } else if (view instanceof MvvmFragment) {
-                    ((MvvmFragment) view).dismissProgress();
-                }
-                return;
             } else {
-                if (method == null) {
-                    Log.e("LiveDataEvent", "事件分发失败，code:" + liveDataEvent.getCode()
-                            + " model:" + MvvmViewModel.this.getClass().getSimpleName());
-                    return;
+                MethodInfo method = events.get(liveDataEvent.getCode());
+                invokeEvent(method, liveDataEvent, view);
+            }
+        });
+    }
+
+    private void invokeEvent(MethodInfo method, LiveDataEvent liveDataEvent, LifecycleOwner view) {
+        if (eventIntercept(liveDataEvent, view)) {
+            return;
+        }
+        if (liveDataEvent.getCode() == EVENT_SUCCESS || liveDataEvent.getCode() == EVENT_FAILED) {
+            if (method == null) {
+                return;
+            }
+        } else if (liveDataEvent.getCode() == EVENT_SHOW_PROGRESS) {
+            Object value = liveDataEvent.getData();
+            if (view instanceof MvvmActivity) {
+                if (value == null) {
+                    ((MvvmActivity) view).showProgress();
+                } else {
+                    ((MvvmActivity) view).showProgress(String.valueOf(value));
+                }
+            } else if (view instanceof MvvmFragment) {
+                if (value == null) {
+                    ((MvvmFragment) view).showProgress();
+                } else {
+                    ((MvvmFragment) view).showProgress(String.valueOf(value));
                 }
             }
-            invoke(method, view, liveDataEvent.getData());
-        });
+            return;
+        } else if (liveDataEvent.getCode() == EVENT_CLOSE_PROGRESS) {
+            if (view instanceof MvvmActivity) {
+                ((MvvmActivity) view).dismissProgress();
+            } else if (view instanceof MvvmFragment) {
+                ((MvvmFragment) view).dismissProgress();
+            }
+            return;
+        } else {
+            if (method == null) {
+                Log.e("LiveDataEvent", "事件分发失败，code:" + liveDataEvent.getCode()
+                        + " model:" + MvvmViewModel.this.getClass().getSimpleName());
+                return;
+            }
+        }
+        invoke(method, view, liveDataEvent.getData());
     }
 
     /**

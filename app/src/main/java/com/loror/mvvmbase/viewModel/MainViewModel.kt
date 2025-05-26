@@ -8,6 +8,10 @@ import com.loror.mvvmbase.model.MainNetModel
 
 class MainViewModel : MvvmViewModel(), LifecycleObserver {
 
+    companion object {
+        const val EVENT_CROSS = 10
+    }
+
     @Sign
     private lateinit var netModel: MainNetModel
 
@@ -15,6 +19,10 @@ class MainViewModel : MvvmViewModel(), LifecycleObserver {
     private lateinit var model: MainModel
 
     private var times = 1
+
+    init {
+        setMultiMode(true)
+    }
 
     fun netBaidu() {
         netModel.netBaidu()
@@ -30,5 +38,9 @@ class MainViewModel : MvvmViewModel(), LifecycleObserver {
 
     fun baiduSuccess(message: String) {
         success(message)
+    }
+
+    fun cross() {
+        dispatchLiveDataEvent(EVENT_CROSS, "通知fragment！")
     }
 }
