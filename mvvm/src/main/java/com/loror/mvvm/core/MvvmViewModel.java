@@ -16,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -133,6 +134,19 @@ public class MvvmViewModel extends ViewModel {
     }
 
     /**
+     * 解绑View，对multiMode生效
+     */
+    public void unAttachView(LifecycleOwner view) {
+        Iterator<WeakReference<LifecycleOwner>> it = attached.iterator();
+        while (it.hasNext()) {
+            WeakReference<LifecycleOwner> ref = it.next();
+            if (ref.get() == null || ref.get() == view) {
+                it.remove();
+            }
+        }
+    }
+
+    /**
      * 绑定View，自动分发事件
      */
     public void attachView(LifecycleOwner view) {
@@ -141,7 +155,9 @@ public class MvvmViewModel extends ViewModel {
                 return;
             }
         }
-        attached.add(new WeakReference<>(view));
+        if (!hasAttached(view)) {
+            attached.add(new WeakReference<>(view));
+        }
         Map<Integer, MethodInfo> events = getEvents(view);
         liveData.observe(view, liveDataEvent -> {
             if (multiMode) {
@@ -194,7 +210,7 @@ public class MvvmViewModel extends ViewModel {
         } else {
             if (method == null) {
                 Log.e("LiveDataEvent", "事件分发失败，code:" + liveDataEvent.getCode()
-                        + " model:" + MvvmViewModel.this.getClass().getSimpleName());
+                        + " model:" + MvvmViewModel.this.getClass().getSimpleName() + " view:" + view);
                 return;
             }
         }
@@ -276,6 +292,15 @@ public class MvvmViewModel extends ViewModel {
      */
     public void dismissProgress() {
         liveData.setValue(new LiveDataEvent(EVENT_CLOSE_PROGRESS, null));
+    }
+
+    private boolean hasAttached(LifecycleOwner view) {
+        for (WeakReference<LifecycleOwner> ref : attached) {
+            if (view == ref.get()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
